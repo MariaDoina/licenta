@@ -1,0 +1,2 @@
+vezi si adauga la api/users/logout o metoda mai buna maibe de a curata cookie din browser
+deocamdata ce am e basic

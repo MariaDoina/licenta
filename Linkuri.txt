@@ -1,0 +1,30 @@
+LA ce ma uitam inainte sa inchid
+A Cooking Recipe Recommendation System
+with Visual Recognition of Food Ingredients
+https://pdfs.semanticscholar.org/9265/b93835a6bd3bc05cc5c4774f53fc7c8e11a1.pdf
+
+Repo: speech to text
+https://github.com/search?q=speech%20to%20text&type=repositories
+
+Fruit and vegetable recognition
+https://github.com/animesh1012/machineLearning/tree/main/Fruits%20and%20Vegetable%20Recognition
+
+yt god: https://www.youtube.com/watch?v=2RxaJrltJKo&list=PLRAV69dS1uWR7KF-zV6YPYtKYEHENETyE&index=2
+
+folder structure next js
+https://medium.com/@mertenercan/nextjs-13-folder-structure-c3453d780366
+
+svg icons
+https://www.svgrepo.com/svg/532363/user-alt-1
+
+mongodb
+https://cloud.mongodb.com/v2/67dd446a2380d816e9bbb9ca#/metrics/replicaSet/67dd453f68e6cd3ac0fb195f/explorer/test/users/find
+
+documentatie next js
+https://nextjs.org/docs/app/building-your-application/authentication#sign-up-and-login-functionality
+
+error handling
+https://nextjs.org/docs/app/building-your-application/routing/error-handling#handling-expected-errors-from-server-actions
+
+good site for web development
+https://zellwk.com/blog/cookies-vs-localstorage-for-storing-access-tokens/
