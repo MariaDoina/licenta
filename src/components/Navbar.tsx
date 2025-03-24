@@ -36,6 +36,7 @@ const Navbar = () => {
           icon="/sign-up.svg"
           variant="btn_white_text"
           className="hidden lg:flex items-center gap-2"
+          href="/signup"
         />
         <Button
           type="button"
@@ -43,6 +44,7 @@ const Navbar = () => {
           icon="/user.svg"
           variant="btn_dark_gray"
           className="hidden lg:flex items-center gap-2"
+          href="/login"
         />
       </div>
 
@@ -95,6 +97,7 @@ const Navbar = () => {
               icon="sign-up.svg"
               variant="btn_white_text"
               className="border w-full text-center border-black"
+              href="/signup"
             />
             <Button
               type="button"
@@ -102,6 +105,7 @@ const Navbar = () => {
               icon="/user.svg"
               variant="btn_dark_gray"
               className="w-full text-center"
+              href="/login"
             />
           </div>
         </div>

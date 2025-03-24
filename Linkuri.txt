@@ -28,3 +28,9 @@ https://nextjs.org/docs/app/building-your-application/routing/error-handling#han
 
 good site for web development
 https://zellwk.com/blog/cookies-vs-localstorage-for-storing-access-tokens/
+
+github yt god
+https://github.com/hiteshchoudhary/nextjs-fullstack-auth/blob/main/src/app/profile/page.tsx
+
+good articles:
+https://zellwk.com/blog/cookies-vs-localstorage-for-storing-access-tokens/

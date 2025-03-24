@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 type ButtonProps = {
   type: "button" | "submit";
@@ -7,6 +8,7 @@ type ButtonProps = {
   variant: string;
   className?: string;
   full?: boolean;
+  href?: string; // Adăugat href
   onClick?: () => void;
   children?: React.ReactNode;
 };
@@ -18,10 +20,11 @@ const Button = ({
   variant,
   className,
   full,
+  href,
   onClick,
   children,
 }: ButtonProps) => {
-  return (
+  const buttonContent = (
     <button
       className={`cursor-pointer flex items-center gap-3 rounded-full border ${variant} ${className} ${
         full && "w-full"
@@ -36,6 +39,13 @@ const Button = ({
       {children}
     </button>
   );
+
+  // Dacă există un href, redirecționează cu Link
+  if (href) {
+    return <Link href={href}>{buttonContent}</Link>;
+  }
+
+  return buttonContent;
 };
 
 export default Button;
