@@ -2,7 +2,6 @@ import { connect } from "@/db/dbConfig";
 import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { log } from "console";
 import jwt from "jsonwebtoken";
 
 connect();
