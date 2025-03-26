@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.log(user);
+    console.log("User luat din verifyEmail API", user);
 
     user.isVerified = true;
     user.verifyToken = undefined;

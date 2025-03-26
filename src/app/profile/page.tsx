@@ -11,12 +11,19 @@ type UserData = {
   username: string;
   email: string;
   profilePic: string;
+  about: string;
+  specialties: string[];
 };
 
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // State for editing
+  const [formData, setFormData] = useState({
+    about: "",
+    specialties: "",
+  });
 
   const logout = async () => {
     try {
@@ -33,10 +40,40 @@ export default function ProfilePage() {
     try {
       const res = await axios.get("/api/users/myUser");
       setUser(res.data.data);
+      setFormData({
+        about: res.data.data.about || "",
+        specialties: res.data.data.specialties.join(", ") || "",
+      });
     } catch (error: any) {
       console.log(error.message);
       toast.error("Failed to get user details");
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const updatedUser = {
+        about: formData.about,
+        specialties: formData.specialties.split(",").map((s) => s.trim()),
+      };
+      await axios.put("/api/users/updateProfile", updatedUser); // Call API endpoint
+      toast.success("Profile updated successfully");
+      setIsEditing(false); // Switch off editing mode
+      getUserDetails(); // Refresh the user data
+    } catch (error: any) {
+      console.log(error.message);
+      toast.error("Failed to update profile");
+    }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   useEffect(() => {
@@ -61,13 +98,14 @@ export default function ProfilePage() {
           <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
             <div className="relative group">
               <div className="h-32 w-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                <Image
-                  src={user?.profilePic || "/default-avatar.jpg"}
+                {/* <Image
+                  //TODO vezi adauga o alta varianta pt profile pic
+                  src={user?.profilePic || ""}
                   alt={user?.username || "Profile Picture"}
                   width={128}
                   height={128}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
+                /> */}
               </div>
             </div>
 
@@ -79,34 +117,74 @@ export default function ProfilePage() {
                     <span className="text-sm">{user?.email}</span>
                   </p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-4 mt-2">
                   <Button
                     type="button"
                     title="Edit Profile"
-                    variant="bg-white text-gray-800 border border-gray-200 py-2 px-4 shadow-sm hover:bg-gray-50"
+                    variant="btn_white_text"
+                    onClick={() => setIsEditing(!isEditing)} // Toggle edit mode
                   />
-                  <Button type="button" title="Settings" variant="py-2 px-4" />
+                  <Button
+                    type="button"
+                    title="Reset Password"
+                    variant="bg-white text-gray-800 border border-gray-200 py-2 px-4 shadow-sm hover:bg-gray-50"
+                    href="/"
+                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white shadow-lg rounded-2xl p-6 text-center">
-            <h2 className="text-xl font-semibold">My Recipes</h2>
-            <p className="text-2xl font-bold">28</p>
-          </div>
-          <div className="bg-white shadow-lg rounded-2xl p-6 text-center">
-            <h2 className="text-xl font-semibold">Favorites</h2>
-            <p className="text-2xl font-bold">164</p>
-          </div>
-          <div className="bg-white shadow-lg rounded-2xl p-6 text-center">
-            <h2 className="text-xl font-semibold">Followers</h2>
-            <p className="text-2xl font-bold">482</p>
-          </div>
-        </div>
+        {/* Edit Form - If editing */}
+        {isEditing && (
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white shadow-lg rounded-2xl p-6 mb-8"
+          >
+            <div className="mb-4">
+              <label
+                className="block text-sm font-semibold text-gray-700 mb-2"
+                htmlFor="about"
+              >
+                About
+              </label>
+              <textarea
+                id="about"
+                name="about"
+                value={formData.about}
+                onChange={handleChange}
+                rows={4}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm"
+                placeholder="Tell us about yourself..."
+              />
+            </div>
+
+            <div className="mb-4">
+              <label
+                className="block text-sm font-semibold text-gray-700 mb-2"
+                htmlFor="specialties"
+              >
+                Cooking Specialties (comma separated)
+              </label>
+              <input
+                type="text"
+                id="specialties"
+                name="specialties"
+                value={formData.specialties}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm"
+                placeholder="e.g. Italian, Vegetarian, Baking"
+              />
+            </div>
+
+            <Button
+              title="Save Changes"
+              variant="bg-blue-500 text-white py-2 px-4 mt-4"
+              type="submit"
+            />
+          </form>
+        )}
 
         {/* Profile Content */}
         <div className="flex flex-col lg:flex-row gap-8">
@@ -114,26 +192,16 @@ export default function ProfilePage() {
             <div className="bg-white shadow-lg rounded-2xl p-6">
               <h2 className="text-xl font-bold mb-4">About</h2>
               <p className="text-gray-700">
-                Food enthusiast and home chef. I love creating simple, delicious
-                meals with fresh ingredients. Sharing my culinary journey one
-                recipe at a time!
+                {user?.about || "No description available"}
               </p>
             </div>
 
             <div className="bg-white shadow-lg rounded-2xl p-6">
               <h2 className="text-xl font-bold mb-4">Cooking Specialties</h2>
               <div className="flex flex-wrap gap-2">
-                {[
-                  "Italian",
-                  "Vegetarian",
-                  "Baking",
-                  "Soups",
-                  "Desserts",
-                  "Breakfast",
-                  "Quick Meals",
-                ].map((skill) => (
+                {user?.specialties?.map((skill, idx) => (
                   <span
-                    key={skill}
+                    key={idx}
                     className="bg-white px-3 py-1.5 rounded-lg text-sm border border-gray-200 shadow-sm"
                   >
                     {skill}
@@ -142,53 +210,14 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-
-          <div className="w-full lg:w-2/3 space-y-6">
-            <div className="bg-white shadow-lg rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold">My Recipes</h2>
-                <Button
-                  type="button"
-                  title="View All"
-                  variant="bg-white text-gray-800 border border-gray-200 py-2 px-4 shadow-sm hover:bg-gray-50"
-                />
-              </div>
-              {/* Here you can map through your recipes */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Example recipe */}
-                <div className="bg-white shadow-lg rounded-xl p-4">
-                  <h3 className="font-bold text-lg mb-1">Homemade Lasagna</h3>
-                  <p className="text-gray-500 text-sm">
-                    Classic Italian comfort food with layers of pasta, rich meat
-                    sauce, and cheese
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white shadow-lg rounded-2xl p-6">
-              <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
-              <div className="space-y-4">
-                {/* Example activity */}
-                <div className="flex items-start gap-3 py-2 border-b border-gray-100 last:border-0">
-                  <div className="h-2 w-2 rounded-full bg-blue-500 mt-2"></div>
-                  <div>
-                    <p className="text-gray-800">
-                      Posted a new recipe: Homemade Lasagna
-                    </p>
-                    <p className="text-xs text-gray-400">2 hours ago</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <Button
           type="button"
           title="Logout"
-          variant="btn_dark_gray"
-          className="hidden lg:flex items-center gap-2"
+          variant="btn_red"
+          // icon="/log-out.svg"
+          className="mt-8 "
           onClick={logout}
         />
       </div>

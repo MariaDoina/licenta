@@ -1,0 +1,40 @@
+// pages/api/users/updateProfile.ts
+
+import { NextRequest, NextResponse } from "next/server";
+import { connect } from "@/db/dbConfig"; // Asigură-te că importul se face corect
+import User from "@/models/userModel"; // Asigură-te că modelul este corect
+
+const updateProfile = async (req: NextRequest, res: NextResponse) => {
+  if (req.method === "PUT") {
+    try {
+      // Conectează-te la baza de date
+      await connect();
+
+      // Obține datele din corpul cererii
+      const { about, specialties } = await req.json();
+
+      // Aici presupunem că ai un middleware pentru autentificare care adaugă `_id` în `req.user`
+      const userId = req.user._id;
+
+      // Actualizează utilizatorul în baza de date
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { about, specialties }, // Actualizezi câmpurile corespunzătoare
+        { new: true } // Returnează utilizatorul actualizat
+      );
+
+      // Răspunde cu succes
+      return res.status(200).json({ success: true, data: updatedUser });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, message: "Server error" });
+    }
+  } else {
+    // Răspunde cu eroare pentru metode nepermise
+    return res
+      .status(405)
+      .json({ success: false, message: "Method not allowed" });
+  }
+};
+
+export default updateProfile;

@@ -16,11 +16,15 @@
   }
 
   .btn_white_text {
-    @apply border-white bg-white px-8 py-3 text-gray-900;
+    @apply bg-white text-gray-800 border border-gray-200 py-2 px-4 px-8 py-3 shadow-sm hover:bg-gray-50;
   }
   /* .btn_gray {
     @apply bg-gray-150 px-8 py-4 text-white transition-all hover:bg-black;
   } */
+
+  .btn_red {
+    @apply bg-red-500 px-8 py-4 text-white transition-all hover:bg-red-600;
+  }
 
   /* SCHIMBA CULORILE CA NU SE POTRIVWSC */
   .btn_dark_green {

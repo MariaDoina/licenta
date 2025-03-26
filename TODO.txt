@@ -1,1 +1,3 @@
 forgot password functionality vezi videoul 4 din playlist
+//TODO fac verificari ca parola sa aiba min se caractere, macar un caracter cu masjucula, un caracter cu litera mica si un caracter special
+ //TODO vezi adauga o alta varianta pt profile pic
