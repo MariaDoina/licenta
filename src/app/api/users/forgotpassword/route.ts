@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
     const { email } = reqBody;
-    console.log(reqBody);
+    console.log("Emailu trimis de pe frontend", reqBody);
 
     const user = await User.findOne({ email });
 

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { usePathname } from "next/navigation"; // Importă usePathname
 import { NAV_LINKS } from "../constants";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,6 +8,20 @@ import Button from "./Button";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname(); // Obține calea actuală
+
+  // Definește rutele unde NU vrei să afișezi navbar-ul
+  const noNavbarRoutes = [
+    "/login",
+    "/signup",
+    "/forgotpassword",
+    "/resetpassword",
+  ];
+
+  // Ascunde navbar-ul dacă ești pe una dintre aceste rute
+  if (noNavbarRoutes.includes(pathname)) {
+    return null;
+  }
 
   return (
     <nav className="flex items-center justify-between max-container padding-container relative z-30 py-5 px-10 overflow-hidden">
@@ -57,6 +72,7 @@ const Navbar = () => {
         className="lg:hidden"
         onClick={() => setIsOpen(!isOpen)}
       />
+
       {/* Mobile Menu */}
       <div
         className={`fixed top-0 right-0 h-screen w-64 bg-white shadow-2xl transform ${

@@ -21,11 +21,12 @@ export default function LoginPage() {
       setIsLoading(true);
       const response = await axios.post("/api/users/login", user);
       console.log("Login successful", response.data);
-      toast.success("Login successful");
+      await toast.success("Login successful");
       router.push("/");
     } catch (error: any) {
-      console.log("Login failed", error.message);
-      toast.error(error.message);
+      toast.error(
+        "User not found. Please check your email and password, then try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -106,8 +107,7 @@ export default function LoginPage() {
             onClick={onLogin}
             type="button"
             title={isLoading ? "Logging In..." : "Log in"}
-            variant="w-full py-3 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 
-            text-white rounded-lg shadow-md transition duration-300 flex items-center justify-center"
+            variant="btn_gradient_green_blue"
             full
           ></Button>
         </div>
@@ -115,12 +115,21 @@ export default function LoginPage() {
         {/* Login Link */}
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">
-            You don't have an account?{" "}
+            You don't have an account?&nbsp;
             <Link
               href="/signup"
               className="text-indigo-600 font-semibold hover:underline"
             >
               Sign Up
+            </Link>
+          </p>
+          <p className="text-sm text-gray-600">
+            Forgot your password?&nbsp;
+            <Link
+              href="/forgotpassword"
+              className="text-indigo-600 font-semibold hover:underline"
+            >
+              Click here
             </Link>
           </p>
         </div>

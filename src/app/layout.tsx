@@ -3,6 +3,7 @@ import { Toaster } from "react-hot-toast";
 
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import { usePathname } from "next/navigation";
 // import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
@@ -18,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        {/* Showing Navbar only if they're not the routes i specified */}
         <Navbar />
         <main className="relative overlfow-hidden">
           {children}

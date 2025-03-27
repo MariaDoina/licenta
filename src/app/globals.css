@@ -34,6 +34,12 @@
     @apply border-gray-50 bg-green-500 px-8 py-5 text-white;
   }
 
+  /* Gradient color */
+  .btn_gradient_green_blue {
+    @apply w-full py-3 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 
+    text-white rounded-lg shadow-md transition duration-300 flex items-center justify-center;
+  }
+
   .text-stroke-3 {
     text-shadow: -1.1px -1.1px 0 black, 1.1px -1.1px 0 black,
       -1.1px 1.1px 0 black, 1.1px 1.1px 0 black;

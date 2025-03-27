@@ -22,10 +22,12 @@ export default function SignupPage() {
       const response = await axios.post("/api/users/signup", user);
       console.log("Signup successful", response.data);
       router.push("/login");
-      toast.success("Signup successful");
+      await toast.success("Signup successful");
     } catch (error: any) {
       console.log("Signup failed", error.message);
-      toast.error(error.message);
+      toast.error(
+        "A user with this email already exists. Please use a different email."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -135,8 +137,7 @@ export default function SignupPage() {
             onClick={onSignup}
             type="button"
             title={isLoading ? "Signing Up..." : "Sign Up"}
-            variant="w-full py-3 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 
-            text-white rounded-lg shadow-md transition duration-300 flex items-center justify-center"
+            variant="btn_gradient_green_blue"
             full
           ></Button>
         </div>
