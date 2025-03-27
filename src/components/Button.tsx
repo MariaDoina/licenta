@@ -26,7 +26,7 @@ const Button = ({
 }: ButtonProps) => {
   const buttonContent = (
     <button
-      className={`cursor-pointer flex items-center gap-3  border ${variant} ${className} ${
+      className={`cursor-pointer flex items-center gap-2  border ${variant} ${className} ${
         full && "w-full"
       }`}
       type={type}

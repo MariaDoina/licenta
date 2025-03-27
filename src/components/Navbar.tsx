@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { usePathname } from "next/navigation"; // Importă usePathname
+import { usePathname } from "next/navigation";
 import { NAV_LINKS } from "../constants";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,9 +8,9 @@ import Button from "./Button";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname(); // Obține calea actuală
+  const pathname = usePathname();
 
-  // Definește rutele unde NU vrei să afișezi navbar-ul
+  // Paths that i dont want the navbar to show in
   const noNavbarRoutes = [
     "/login",
     "/signup",
@@ -18,13 +18,13 @@ const Navbar = () => {
     "/resetpassword",
   ];
 
-  // Ascunde navbar-ul dacă ești pe una dintre aceste rute
+  // Hide the navbar if i am on that path
   if (noNavbarRoutes.includes(pathname)) {
     return null;
   }
 
   return (
-    <nav className="flex items-center justify-between max-container padding-container relative z-30 py-5 px-10 overflow-hidden">
+    <nav className="flex items-center justify-between max-container padding-container relative z-30 py-5 px-10 overflow-hidden  bg-gradient-to-br from-green-400 to-blue-500">
       {/* Logo */}
       <Link href="/">
         <Image src="/logo-recipe-app.svg" alt="logo" width={100} height={50} />
@@ -36,7 +36,7 @@ const Navbar = () => {
           <Link
             href={link.href}
             key={link.key}
-            className="regular-16 text-gray-500 flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
+            className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
           >
             {link.label}
           </Link>

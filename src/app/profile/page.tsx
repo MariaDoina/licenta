@@ -128,7 +128,7 @@ export default function ProfilePage() {
                     type="button"
                     title="Reset Password"
                     variant="bg-white text-gray-800 border border-gray-200 py-2 px-4 shadow-sm hover:bg-gray-50"
-                    href="/"
+                    href="/forgotpassword"
                   />
                 </div>
               </div>

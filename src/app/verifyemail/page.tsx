@@ -2,6 +2,8 @@
 import axios from "axios";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import toast from "react-hot-toast";
 
 export default function VerifyEmailPage() {
   const [token, setToken] = useState("");
@@ -14,7 +16,7 @@ export default function VerifyEmailPage() {
       setVerified(true);
     } catch (error: any) {
       setError(true);
-      console.log(error.response.data);
+      toast.error("Something went wrong! Please try again later.");
     }
   };
 
@@ -30,24 +32,55 @@ export default function VerifyEmailPage() {
   }, [token]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1 className="text-4xl ">Verify your email</h1>
-      <h2 className="p-2 bg-orange-500 text-black">
-        {token ? `${token}` : "no token"}
-      </h2>
-
-      {verified && (
-        <div>
-          <h2 className="text-2xl">Your email has been verified</h2>
-          <Link href="/login">Login</Link>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-400 to-blue-500 p-6">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-8 space-y-6">
+        {/* Header Section */}
+        <div className="text-center mb-6">
+          <div className="flex justify-center mb-4">
+            <div className="h-20 w-20 rounded-full bg-white shadow-lg flex items-center justify-center">
+              <Image
+                src="/verify_email.svg"
+                alt="verify-email-icon"
+                width={100}
+                height={50}
+              />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold mb-2 text-gray-800">
+            Verify Your Email
+          </h1>
+          <p className="text-gray-600 text-sm">
+            Please verify your email address to complete the registration.
+          </p>
         </div>
-      )}
 
-      {error && (
-        <div>
-          <h2 className="text-2xl bg-red-500 text-black">Error</h2>
+        {/* Verification Result */}
+        {verified && (
+          <div className="text-center mt-4">
+            <h2 className="text-2xl font-semibold text-green-600">
+              Your email has been successfully verified!
+            </h2>
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center mt-4">
+            <h2 className="text-2xl font-semibold text-red-600">
+              Something went wrong. Please try again later.
+            </h2>
+          </div>
+        )}
+
+        {/* Back to Home Link */}
+        <div className="text-center mt-6">
+          <Link
+            href="/"
+            className="text-sm text-gray-600 font-semibold hover:underline"
+          >
+            Back to Home
+          </Link>
         </div>
-      )}
+      </div>
     </div>
   );
 }

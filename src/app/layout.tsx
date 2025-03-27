@@ -3,8 +3,8 @@ import { Toaster } from "react-hot-toast";
 
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import { usePathname } from "next/navigation";
-// import Footer from "@/components/Footer";
+
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Recipe App",
@@ -25,7 +25,7 @@ export default function RootLayout({
           {children}
           <Toaster position="top-center" />
         </main>
-        {/* <Footer /> */}
+        <Footer />
       </body>
     </html>
   );
