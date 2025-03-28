@@ -27,7 +27,7 @@ const Navbar = () => {
     <nav className="flex items-center justify-between max-container padding-container relative z-30 py-5 px-10 overflow-hidden  bg-gradient-to-br from-green-400 to-blue-500">
       {/* Logo */}
       <Link href="/">
-        <Image src="/logo-recipe-app.svg" alt="logo" width={100} height={50} />
+        <Image src="/logo.png" alt="logo" width={100} height={50} />
       </Link>
 
       {/* Desktop Menu */}

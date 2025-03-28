@@ -26,12 +26,7 @@ const Footer = () => {
       <div className="padding-container max-container flex w-full flex-col gap-14 px-10 md:px-20 ">
         <div className="flex flex-col items-start justify-center gap-[10%] md:flex-row  mt-10">
           <Link href="/" className="mb-10">
-            <Image
-              src="/logo-recipe-app.svg"
-              alt="logo"
-              width={74}
-              height={29}
-            />
+            <Image src="/logo.png" alt="logo" width={74} height={29} />
           </Link>
           {/* Our Community */}
           <div className="flex flex-wrap gap-10 sm:justify-between md:flex-1 text-white">

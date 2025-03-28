@@ -35,12 +35,29 @@ const userSchema = new mongoose.Schema({
 
   about: {
     type: String,
-    default: "", // Descrierea utilizatorului, goală la început
+    default: "",
+    trim: true,
+    validate: {
+      validator: function (v) {
+        return v.trim().length <= 500;
+      },
+      message: "About section cannot exceed 500 characters.",
+    },
   },
 
   specialties: {
     type: [String],
-    default: [], // Specialitățile culinare, listă goală la început
+    default: [],
+    validate: {
+      validator: function (v) {
+        return v.length <= 10;
+      },
+      message: "You can specify up to 10 specialties.",
+    },
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

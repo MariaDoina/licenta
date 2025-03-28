@@ -52,10 +52,22 @@ export default function ProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (formData.about.length > 500) {
+      return toast.error("About section cannot exceed 500 characters.");
+    }
+
+    const specialtiesArray = formData.specialties
+      .split(",")
+      .map((s) => s.trim());
+    if (specialtiesArray.length > 10) {
+      return toast.error("You can specify up to 10 specialties.");
+    }
+
     try {
       const updatedUser = {
         about: formData.about,
-        specialties: formData.specialties.split(",").map((s) => s.trim()),
+        specialties: specialtiesArray,
       };
       await axios.put("/api/users/updateProfile", updatedUser); // Call API endpoint
       toast.success("Profile updated successfully");
@@ -95,22 +107,24 @@ export default function ProfilePage() {
       <div className="container mx-auto relative z-10 -mt-24 pb-20">
         {/* Profile Header */}
         <div className="bg-white shadow-lg rounded-2xl p-8 mb-8 glassmorphism animate-blur-in">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
-            <div className="relative group">
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            {/* Profile Picture Section */}
+            <div className="relative group flex justify-center">
               <div className="h-32 w-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                {/* Imaginea de profil */}
                 {/* <Image
-                  //TODO vezi adauga o alta varianta pt profile pic
-                  src={user?.profilePic || ""}
-                  alt={user?.username || "Profile Picture"}
-                  width={128}
-                  height={128}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                /> */}
+              src={user?.profilePic || ""}
+              alt={user?.username || "Profile Picture"}
+              width={128}
+              height={128}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            /> */}
               </div>
             </div>
 
-            <div className="flex-1">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            {/* Profile Info Section */}
+            <div className="flex-1 text-center md:text-left">
+              <div className="flex flex-col md:flex-row items-center md:justify-between gap-4 mb-4">
                 <div>
                   <h1 className="text-3xl font-bold mb-1">{user?.username}</h1>
                   <p className="text-gray-500 flex items-center gap-2">
@@ -187,15 +201,19 @@ export default function ProfilePage() {
         )}
 
         {/* Profile Content */}
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="w-full lg:w-1/3 space-y-6">
+        <div className="flex gap-8 flex-wrap lg:flex-nowrap">
+          {/* About Section */}
+          <div className="w-full lg:w-1/2">
             <div className="bg-white shadow-lg rounded-2xl p-6">
               <h2 className="text-xl font-bold mb-4">About</h2>
               <p className="text-gray-700">
                 {user?.about || "No description available"}
               </p>
             </div>
+          </div>
 
+          {/* Cooking Specialties Section */}
+          <div className="w-full lg:w-1/2">
             <div className="bg-white shadow-lg rounded-2xl p-6">
               <h2 className="text-xl font-bold mb-4">Cooking Specialties</h2>
               <div className="flex flex-wrap gap-2">
@@ -212,14 +230,16 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <Button
-          type="button"
-          title="Logout"
-          variant="btn_red"
-          // icon="/log-out.svg"
-          className="mt-8 "
-          onClick={logout}
-        />
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            title="Logout"
+            variant="btn_red"
+            // icon="/log-out.svg"
+            className=" mt-8"
+            onClick={logout}
+          />
+        </div>
       </div>
     </div>
   );

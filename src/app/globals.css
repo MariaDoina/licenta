@@ -23,7 +23,7 @@
   } */
 
   .btn_red {
-    @apply bg-red-500 px-8 py-4 text-white transition-all hover:bg-red-600;
+    @apply bg-red-500 px-8 py-4 text-white transition-all hover:bg-red-600 rounded-full;
   }
 
   /* SCHIMBA CULORILE CA NU SE POTRIVWSC */
