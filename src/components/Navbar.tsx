@@ -43,7 +43,11 @@ const Navbar = () => {
       </Link>
 
       {/* Desktop Menu */}
-      <ul className="hidden h-full gap-10 lg:flex pr-50 mr-auto pl-32">
+      <ul
+        className={`hidden h-full gap-10 lg:flex pr-50  ${
+          !isAuthenticated ? "mr-0 pl-0" : "mr-auto pl-32"
+        }`}
+      >
         {NAV_LINKS.map((link) => (
           <Link
             href={link.href}
