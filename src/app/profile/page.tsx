@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
 import Image from "next/image";
+import { useLoadingState } from "@/hooks/useLoadingState";
 
 type UserData = {
   _id: string;
@@ -18,21 +19,26 @@ type UserData = {
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(false);
+
   const [isEditing, setIsEditing] = useState(false); // State for editing
   const [formData, setFormData] = useState({
     about: "",
     specialties: "",
   });
 
+  const { isLoading, startLoading, stopLoading } = useLoadingState();
+
   const logout = async () => {
     try {
+      startLoading();
       await axios.get("/api/users/logout");
       toast.success("Logged out successfully");
       router.push("/login");
     } catch (error: any) {
       console.log(error.message);
       toast.error("Failed to logout");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -65,6 +71,7 @@ export default function ProfilePage() {
     }
 
     try {
+      startLoading();
       const updatedUser = {
         about: formData.about,
         specialties: specialtiesArray,
@@ -76,6 +83,8 @@ export default function ProfilePage() {
     } catch (error: any) {
       console.log(error.message);
       toast.error("Failed to update profile");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -193,6 +202,7 @@ export default function ProfilePage() {
             </div>
 
             <Button
+              loading={isLoading}
               title="Save Changes"
               variant="bg-blue-500 text-white py-2 px-4 mt-4"
               type="submit"
@@ -233,6 +243,7 @@ export default function ProfilePage() {
         <div className="flex justify-end">
           <Button
             type="button"
+            loading={isLoading}
             title="Logout"
             variant="btn_red"
             // icon="/log-out.svg"

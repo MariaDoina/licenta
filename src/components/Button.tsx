@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import LoadingSpinner from "./LoadingSpinner";
 
 type ButtonProps = {
   type: "button" | "submit";
@@ -11,6 +12,7 @@ type ButtonProps = {
   href?: string; // Adăugat href
   onClick?: () => void;
   children?: React.ReactNode;
+  loading?: boolean;
 };
 
 const Button = ({
@@ -23,6 +25,7 @@ const Button = ({
   href,
   onClick,
   children,
+  loading,
 }: ButtonProps) => {
   const buttonContent = (
     <button
@@ -31,7 +34,9 @@ const Button = ({
       }`}
       type={type}
       onClick={onClick}
+      disabled={loading}
     >
+      {loading && <LoadingSpinner size="sm" />}
       {icon && <Image src={icon} alt={title} width={24} height={24} />}
       <label className="bold-16 whitespace-nowrap cursor-pointer">
         {title}

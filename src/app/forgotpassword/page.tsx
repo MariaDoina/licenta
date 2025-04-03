@@ -4,10 +4,11 @@ import { toast } from "react-hot-toast";
 import { useState } from "react";
 import Image from "next/image";
 import Button from "@/components/Button";
+import { useLoadingState } from "@/hooks/useLoadingState";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { isLoading, startLoading, stopLoading } = useLoadingState();
 
   const onHandleSubmit = async (e: any) => {
     e.preventDefault();
@@ -18,7 +19,7 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      setIsLoading(true);
+      startLoading();
       const res = await axios.post("/api/users/forgotpassword", { email });
       toast.success("We’ve sent you a reset link! Please check your inbox.");
     } catch (error: any) {
@@ -28,7 +29,7 @@ export default function ForgotPasswordPage() {
         toast.error("Something went wrong! Please try again later.");
       }
     } finally {
-      setIsLoading(false);
+      stopLoading();
     }
   };
 
@@ -82,6 +83,7 @@ export default function ForgotPasswordPage() {
 
           <Button
             type="submit"
+            loading={isLoading}
             title={isLoading ? "Sending..." : "Send Reset Link"}
             variant="btn_gradient_green_blue"
             full

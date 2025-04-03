@@ -6,6 +6,7 @@ import Button from "@/components/Button";
 import Image from "next/image";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { useLoadingState } from "@/hooks/useLoadingState";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -14,11 +15,11 @@ export default function SignupPage() {
     password: "",
     username: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const { isLoading, startLoading, stopLoading } = useLoadingState();
 
   const onSignup = async () => {
     try {
-      setIsLoading(true);
+      startLoading();
       const response = await axios.post("/api/users/signup", user);
       console.log("Signup successful", response.data);
       router.push("/login");
@@ -29,7 +30,7 @@ export default function SignupPage() {
         "A user with this email already exists. Please use a different email."
       );
     } finally {
-      setIsLoading(false);
+      stopLoading();
     }
   };
 
@@ -136,6 +137,7 @@ export default function SignupPage() {
           <Button
             onClick={onSignup}
             type="button"
+            loading={isLoading}
             title={isLoading ? "Signing Up..." : "Sign Up"}
             variant="btn_gradient_green_blue"
             full

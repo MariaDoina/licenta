@@ -6,6 +6,7 @@ import Button from "@/components/Button";
 import Image from "next/image";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { useLoadingState } from "@/hooks/useLoadingState";
 
 export default function ResetPasswordPage() {
   const [token, setToken] = useState(""); // Set the token from the url
@@ -13,7 +14,7 @@ export default function ResetPasswordPage() {
     newPassword: "",
     confirmPassword: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const { isLoading, startLoading, stopLoading } = useLoadingState();
   const router = useRouter();
 
   // Extract token from url
@@ -30,7 +31,7 @@ export default function ResetPasswordPage() {
     }
 
     try {
-      setIsLoading(true);
+      startLoading();
 
       // Trimiterea cererii pentru resetarea parolei
       const response = await axios.post("/api/users/resetpassword", {
@@ -44,7 +45,7 @@ export default function ResetPasswordPage() {
     } catch (error: any) {
       toast.error("Failed to reset password. Please try again.");
     } finally {
-      setIsLoading(false);
+      stopLoading();
     }
   };
 
@@ -132,6 +133,7 @@ export default function ResetPasswordPage() {
           <Button
             onClick={onResetPassword}
             type="button"
+            loading={isLoading}
             title={isLoading ? "Resetting..." : "Reset Password"}
             variant="w-full py-3 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white rounded-lg shadow-md transition duration-300 flex items-center justify-center"
             full
