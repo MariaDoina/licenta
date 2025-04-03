@@ -1,30 +1,42 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { NAV_LINKS } from "../constants";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "./Button";
+import axios from "axios";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const pathname = usePathname();
 
-  // Paths that i dont want the navbar to show in
-  const noNavbarRoutes = [
+  // list to check if navbar has to be hidden
+  const shouldHideNavbar = [
     "/login",
     "/signup",
     "/forgotpassword",
     "/resetpassword",
-  ];
+  ].includes(pathname);
 
-  // Hide the navbar if i am on that path
-  if (noNavbarRoutes.includes(pathname)) {
-    return null;
-  }
+  // check user authentication
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get("/api/users/auth_check");
+        setIsAuthenticated(response.data.success);
+      } catch (error) {
+        setIsAuthenticated(false);
+      }
+    };
+    checkAuth();
+  }, [pathname]);
+
+  if (shouldHideNavbar || isAuthenticated === null) return null;
 
   return (
-    <nav className="flex items-center justify-between max-container padding-container relative z-30 py-5 px-10 overflow-hidden  bg-gradient-to-br from-green-400 to-blue-500">
+    <nav className="flex items-center justify-between max-container padding-container relative z-30 py-5 px-10 overflow-hidden bg-gradient-to-br from-green-400 to-blue-500">
       {/* Logo */}
       <Link href="/">
         <Image src="/logo.png" alt="logo" width={100} height={50} />
@@ -43,25 +55,27 @@ const Navbar = () => {
         ))}
       </ul>
 
-      {/* Desktop Buttons */}
-      <div className="lg:flexCenter flex gap-1">
-        <Button
-          type="button"
-          title="Sign Up"
-          icon="/sign-up.svg"
-          variant="btn_white_text"
-          className="hidden lg:flex items-center gap-2"
-          href="/signup"
-        />
-        <Button
-          type="button"
-          title="Log in"
-          icon="/user.svg"
-          variant="btn_dark_gray"
-          className="hidden lg:flex items-center gap-2"
-          href="/login"
-        />
-      </div>
+      {/* Desktop Buttons - show them only if user is not Authenticated */}
+      {!isAuthenticated && (
+        <div className="lg:flexCenter flex gap-3">
+          <Button
+            type="button"
+            title="Sign Up"
+            icon="/sign-up.svg"
+            variant="btn_white_text"
+            className="hidden lg:flex items-center gap-2"
+            href="/signup"
+          />
+          <Button
+            type="button"
+            title="Log in"
+            icon="/user.svg"
+            variant="btn_dark_gray"
+            className="hidden lg:flex items-center gap-2"
+            href="/login"
+          />
+        </div>
+      )}
 
       {/* Mobile Menu Button */}
       <Button
@@ -105,25 +119,27 @@ const Navbar = () => {
             ))}
           </ul>
 
-          {/* Mobile Buttons */}
-          <div className="flex flex-col items-center gap-4 mt-6">
-            <Button
-              type="button"
-              title="Sign Up"
-              icon="sign-up.svg"
-              variant="btn_white_text"
-              className="border w-full text-center border-black"
-              href="/signup"
-            />
-            <Button
-              type="button"
-              title="Log in"
-              icon="/user.svg"
-              variant="btn_dark_gray"
-              className="w-full text-center"
-              href="/login"
-            />
-          </div>
+          {/* Mobile Buttons - show them only if user is not Authenticated */}
+          {!isAuthenticated && (
+            <div className="flex flex-col items-center gap-4 mt-6">
+              <Button
+                type="button"
+                title="Sign Up"
+                icon="sign-up.svg"
+                variant="btn_white_text"
+                className="border w-full text-center border-black"
+                href="/signup"
+              />
+              <Button
+                type="button"
+                title="Log in"
+                icon="/user.svg"
+                variant="btn_dark_gray"
+                className="w-full text-center"
+                href="/login"
+              />
+            </div>
+          )}
         </div>
       </div>
     </nav>
