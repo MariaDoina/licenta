@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { toast } from "react-hot-toast"; // Importă toast-ul
 import { NAV_LINKS } from "../constants";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,7 +13,7 @@ const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const pathname = usePathname();
 
-  // list to check if navbar has to be hidden
+  // List to check if navbar has to be hidden
   const shouldHideNavbar = [
     "/login",
     "/signup",
@@ -20,7 +21,7 @@ const Navbar = () => {
     "/resetpassword",
   ].includes(pathname);
 
-  // check user authentication
+  // Check user authentication
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -32,6 +33,15 @@ const Navbar = () => {
     };
     checkAuth();
   }, [pathname]);
+
+  // Check if the user is authenticated if not show them a message as to why they can't access other links
+  const handleLinkClick = (href: string) => {
+    if (!isAuthenticated) {
+      toast.error("You need to be logged in to access this page.");
+    } else {
+      window.location.href = href;
+    }
+  };
 
   if (shouldHideNavbar || isAuthenticated === null) return null;
 
@@ -53,6 +63,7 @@ const Navbar = () => {
             href={link.href}
             key={link.key}
             className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
+            onClick={() => handleLinkClick(link.href)} // Add toast logic for link click
           >
             {link.label}
           </Link>
@@ -115,7 +126,10 @@ const Navbar = () => {
                 <Link
                   href={link.href}
                   className="text-gray-500 text-lg hover:font-bold"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    setIsOpen(false); // Close the menu when a link is clicked
+                    handleLinkClick(link.href); // Add toast logic for link click
+                  }}
                 >
                   {link.label}
                 </Link>

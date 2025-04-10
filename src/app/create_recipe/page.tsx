@@ -126,7 +126,7 @@ export default function CreateRecipe() {
                 type="button"
                 icon="plus.svg"
                 title="Add"
-                variant="btn_small_gradient p-3 pr-6"
+                variant="btn_small_gradient p-3 pr-6 sm: pr-10"
                 onClick={handleAddIngredient}
               />
             </div>
