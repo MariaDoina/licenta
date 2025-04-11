@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import Button from "@/components/Button";
-import { div } from "framer-motion/client";
+import { motion } from "framer-motion";
 
 export default function CreateRecipe() {
   const [title, setTitle] = useState("");
@@ -70,13 +70,25 @@ export default function CreateRecipe() {
       <div className="max-w-3xl mx-auto p-6 ">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+            <motion.h1
+              initial={{ opacity: 0, y: -30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-3xl md:text-4xl font-bold text-gray-800 mb-4"
+            >
               Recipe Oasis
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-lg text-gray-600 max-w-2xl mx-auto"
+            >
               Create and save your favorite recipes in one place. Share with
               friends or keep them as your culinary secrets.
-            </p>
+            </motion.p>
           </div>
         </div>
         <div className="bg-gray-50 mb-10 p-8 rounded-lg shadow-xl">
