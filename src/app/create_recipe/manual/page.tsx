@@ -6,16 +6,18 @@ import Image from "next/image";
 import Button from "@/components/Button";
 import { motion } from "framer-motion";
 import IngredientInput from "@/components/IngredientInput";
+import { useLoadingState } from "@/hooks/useLoadingState";
 
 export default function CreateRecipe() {
   const [title, setTitle] = useState("");
   const [ingredientList, setIngredientList] = useState<string[]>([]);
   const [instructions, setInstructions] = useState("");
   const [cookingTime, setCookingTime] = useState("");
+  const { isLoading, startLoading, stopLoading } = useLoadingState();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    startLoading();
     // Validate inputs
     if (
       !title ||
@@ -24,6 +26,7 @@ export default function CreateRecipe() {
       !cookingTime
     ) {
       toast.error("Please fill all fields");
+      stopLoading();
       return;
     }
 
@@ -50,6 +53,8 @@ export default function CreateRecipe() {
       setCookingTime("");
     } catch (error: any) {
       toast.error("Error creating recipe. Please try again later.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -156,6 +161,7 @@ export default function CreateRecipe() {
               type="submit"
               title="Create Recipe"
               variant="btn_small_gradient mx-auto block"
+              loading={isLoading}
             />
           </form>
         </div>

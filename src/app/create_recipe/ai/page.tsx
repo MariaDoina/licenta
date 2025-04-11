@@ -5,45 +5,37 @@ import React, { useState } from "react";
 import IngredientInput from "@/components/IngredientInput";
 import { useLoadingState } from "@/hooks/useLoadingState";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function GenerateRecipePage() {
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [recipes, setRecipes] = useState<any[]>([]);
   const { isLoading, startLoading, stopLoading } = useLoadingState();
-  const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
-    // Începe încărcarea
-
     startLoading();
-    setError(null);
 
     try {
-      // Trimite cererea pentru a genera rețeta
       const response = await axios.post("/api/recipes/generateRecipe", {
         ingredients,
       });
 
-      // Verifică răspunsul API-ului
-      console.log("Response Data:", response.data);
-
       const data = response.data;
+      console.log("API response data:", data);
 
-      // Verifică dacă există rețeta generată
-      if (!data || !data.recipe) {
+      const recipe = data.recipe || data.savedRecipe || null;
+
+      if (!recipe) {
         throw new Error("No recipe found");
       }
 
-      // Actualizează starea cu rețeta
-      setRecipes((prev) => {
-        console.log("Previous Recipes:", prev); // Logăm rețetele anterioare
-        const updatedRecipes = [...prev, data.recipe];
-        console.log("Updated Recipes:", updatedRecipes); // Logăm noile rețete
-        return updatedRecipes;
-      });
+      // Afișează DOAR o rețetă, nu adaugă la listă
+      setRecipes([recipe]);
     } catch (err: any) {
-      setError(err.message);
-      console.error("Error:", err.message); // Logăm eroarea
+      toast.error(
+        "Error generating recipe. Please check your ingredients and try again."
+      );
+      console.error("Error:", err.message);
     } finally {
       stopLoading();
     }
@@ -73,13 +65,11 @@ export default function GenerateRecipePage() {
           recipe for you to try.
         </motion.p>
 
-        {/* Ingredient Input Component */}
         <IngredientInput
           ingredientList={ingredients}
           setIngredientList={setIngredients}
         />
 
-        {/* Butonul pentru generarea rețetei */}
         <Button
           type="button"
           title={isLoading ? "Generating..." : "Generate Recipe"}
@@ -88,10 +78,6 @@ export default function GenerateRecipePage() {
           loading={isLoading}
         />
 
-        {/* Mesaj de eroare */}
-        {error && <p className="text-red-600 mt-4">Error: {error}</p>}
-
-        {/* Afișarea rețetelor generate */}
         <div className="mt-6 space-y-6">
           {recipes.length > 0 ? (
             recipes.map((recipe, index) => (
@@ -100,6 +86,11 @@ export default function GenerateRecipePage() {
                 <p className="text-gray-600">
                   Cooking time: {recipe.cookingTime} min
                 </p>
+                <ul className="text-sm text-left list-disc list-inside my-2 text-gray-700">
+                  {recipe.ingredients?.map((ing: string, idx: number) => (
+                    <li key={idx}>{ing}</li>
+                  ))}
+                </ul>
                 <div
                   className="prose max-w-none mt-2"
                   dangerouslySetInnerHTML={{ __html: recipe.instructions }}
