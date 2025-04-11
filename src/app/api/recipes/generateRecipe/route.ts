@@ -15,13 +15,29 @@ export async function POST(request: NextRequest) {
     console.log("Ingredients:", ingredients);
 
     // Check if there is an existing recipe in the database with the introduced ingredients
+    const normalizedIngredients = ingredients
+      .map((i: string) => i.trim().toLowerCase())
+      .sort();
+    console.log("Normalized Ingredients:", normalizedIngredients);
+
     const existingRecipe = await Recipe.findOne({
-      ingredients: { $all: ingredients.sort() },
+      ingredients: {
+        $all: normalizedIngredients,
+      },
     });
 
     if (existingRecipe) {
       console.log("Recipe found in database");
-      return JSON.parse(existingRecipe.recipe_content);
+      return NextResponse.json({
+        success: true,
+        message: "Recipe found in database",
+        recipe: {
+          title: existingRecipe.title,
+          ingredients: existingRecipe.ingredients,
+          instructions: existingRecipe.instructions,
+          cookingTime: existingRecipe.cookingTime,
+        },
+      });
     }
 
     // If the recipe doesn't exist, generate a new one
