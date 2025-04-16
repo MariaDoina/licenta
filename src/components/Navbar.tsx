@@ -1,17 +1,35 @@
 "use client";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { toast } from "react-hot-toast"; // Importă toast-ul
+import { toast } from "react-hot-toast";
 import { NAV_LINKS } from "../constants";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "./Button";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const pathname = usePathname();
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [showNavbar, setShowNavbar] = useState(true);
+
+  //use Effect to make navbar appear or dissapear
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > lastScrollY) {
+        setShowNavbar(false);
+      } else {
+        setShowNavbar(true);
+      }
+      setLastScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
 
   // List to check if navbar has to be hidden
   const shouldHideNavbar = [
@@ -35,8 +53,10 @@ const Navbar = () => {
   }, [pathname]);
 
   // Check if the user is authenticated if not show them a message as to why they can't access other links
+  const publicRoutes = ["/"];
+
   const handleLinkClick = (href: string) => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !publicRoutes.includes(href)) {
       toast.error("You need to be logged in to access this page.");
     } else {
       window.location.href = href;
@@ -46,7 +66,12 @@ const Navbar = () => {
   if (shouldHideNavbar || isAuthenticated === null) return null;
 
   return (
-    <nav className="flex items-center justify-between max-container padding-container relative z-30 py-5 px-10 overflow-hidden bg-gradient-to-br from-green-400 to-blue-500">
+    <motion.nav
+      initial={{ y: 0 }}
+      animate={{ y: showNavbar ? 0 : -120 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="sticky top-0 flex items-center justify-between max-container padding-container z-30 py-5 px-10 overflow-hidden bg-gradient-to-br from-green-400 to-blue-500"
+    >
       {/* Logo */}
       <Link href="/">
         <Image src="/logo.png" alt="logo" width={100} height={50} />
@@ -55,7 +80,7 @@ const Navbar = () => {
       {/* Desktop Menu */}
       <ul
         className={`hidden h-full gap-10 lg:flex pr-50  ${
-          !isAuthenticated ? "mr-0 pl-0" : "mr-auto pl-32"
+          !isAuthenticated ? "mr-0 pl-0" : "mr-auto pl-15"
         }`}
       >
         {NAV_LINKS.map((link) => (
@@ -63,7 +88,7 @@ const Navbar = () => {
             href={link.href}
             key={link.key}
             className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
-            onClick={() => handleLinkClick(link.href)} // Add toast logic for link click
+            onClick={() => handleLinkClick(link.href)}
           >
             {link.label}
           </Link>
@@ -160,7 +185,7 @@ const Navbar = () => {
           )}
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 
