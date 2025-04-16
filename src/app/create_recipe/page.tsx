@@ -54,8 +54,8 @@ const CreateRecipe = () => {
               Generate with AI
             </h2>
             <p className="text-gray-600 text-md">
-              Let artificial intelligence suggest recipes based on the
-              ingredients you have or your culinary preferences.
+              Let AI suggest recipes based on the ingredients you have or your
+              culinary preferences.
             </p>
           </motion.div>
         </Link>
