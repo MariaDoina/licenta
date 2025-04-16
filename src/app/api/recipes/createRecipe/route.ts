@@ -1,37 +1,33 @@
 import { connect } from "@/db/dbConfig";
 import Recipe from "@/models/recipeModel";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { verifyToken } from "@/helpers/verifyToken";
 
 connect();
 
 export async function POST(request: NextRequest) {
   try {
     const token = request.cookies.get("token")?.value;
+    const decodedToken = verifyToken(token);
 
-    if (!token) {
+    if (!decodedToken) {
       return NextResponse.json(
         { message: "User not authenticated" },
         { status: 401 }
       );
     }
 
-    //Check if the token is valid
-    const decodedToken = jwt.verify(
-      token,
-      process.env.TOKEN_SECRET!
-    ) as jwt.JwtPayload;
+    const { id } = decodedToken;
 
     const reqBody = await request.json();
     const { title, ingredients, instructions, cookingTime } = reqBody;
 
-    //Save recipe to MongoDB
     const newRecipe = new Recipe({
       title,
       ingredients,
       instructions,
       cookingTime,
-      userOwner: decodedToken.id,
+      userOwner: id,
       createdAt: new Date(),
       isGenerated: false,
     });
@@ -44,8 +40,6 @@ export async function POST(request: NextRequest) {
       success: true,
       savedRecipe,
     });
-
-    console.log(reqBody);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

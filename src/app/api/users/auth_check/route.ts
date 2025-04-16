@@ -1,27 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { verifyToken } from "@/helpers/verifyToken";
 
 export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get("token")?.value;
-
-    //If token is not available it means user is not authenticated
-    if (!token) {
-      return NextResponse.json(
-        { message: "Not authenticated", success: false },
-        { status: 401 }
-      );
-    }
+    const decodedToken = verifyToken(token);
 
     //Check if the token is valid
-    const decodedToken = jwt.verify(
-      token,
-      process.env.TOKEN_SECRET!
-    ) as jwt.JwtPayload;
-
     if (!decodedToken) {
       return NextResponse.json(
-        { message: "Invalid token", success: false },
+        { message: "User not authenticated" },
         { status: 401 }
       );
     }
