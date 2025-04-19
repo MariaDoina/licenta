@@ -37,6 +37,7 @@ const Navbar = () => {
     "/signup",
     "/forgotpassword",
     "/resetpassword",
+    "/verifyemail",
   ].includes(pathname);
 
   // Check user authentication

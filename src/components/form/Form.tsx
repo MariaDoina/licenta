@@ -1,4 +1,3 @@
-// components/auth/AuthForm.tsx
 "use client";
 import React from "react";
 import InputWithIcon from "@/components/ui/InputWithIcon";
@@ -10,9 +9,10 @@ interface Field {
   placeholder: string;
   iconSrc: string;
   value: string;
+  rows?: number;
 }
 
-interface AuthFormProps {
+interface FormProps {
   fields: Field[];
   onChange: (name: string, value: string) => void;
   onSubmit: () => void;
@@ -20,13 +20,13 @@ interface AuthFormProps {
   buttonText: string;
 }
 
-export default function AuthForm({
+export default function Form({
   fields,
   onChange,
   onSubmit,
   loading,
   buttonText,
-}: AuthFormProps) {
+}: FormProps) {
   return (
     <div className="space-y-4">
       {fields.map((field) => (
