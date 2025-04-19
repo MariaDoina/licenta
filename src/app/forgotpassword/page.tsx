@@ -5,7 +5,7 @@ import Button from "@/components/Button";
 import { useLoadingState } from "@/hooks/useLoadingState";
 import { useAuth } from "@/hooks/ApiRequests";
 import IconHeader from "@/components/ui/IconHeader";
-import Form from "@/components/form/Form";
+import Form from "@/components/forms/AuthForm";
 
 export default function ForgotPasswordPage() {
   const [user, setUser] = useState({ email: "" });

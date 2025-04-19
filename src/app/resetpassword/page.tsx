@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/ApiRequests";
 import { toast } from "react-hot-toast";
 import { useLoadingState } from "@/hooks/useLoadingState";
 import IconHeader from "@/components/ui/IconHeader";
-import Form from "@/components/form/Form";
+import Form from "@/components/forms/AuthForm";
 
 export default function ResetPasswordPage() {
   const { resetPassword } = useAuth();

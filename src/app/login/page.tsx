@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useLoadingState } from "@/hooks/useLoadingState";
 import { useAuth } from "@/hooks/ApiRequests";
 import IconHeader from "@/components/ui/IconHeader";
-import Form from "@/components/form/Form";
+import Form from "@/components/forms/AuthForm";
 
 export default function LoginPage() {
   const [user, setUser] = useState({ email: "", password: "" });
