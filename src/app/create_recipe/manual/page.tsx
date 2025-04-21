@@ -5,8 +5,7 @@ import { toast } from "react-hot-toast";
 import Image from "next/image";
 import Button from "@/components/Button";
 import { motion } from "framer-motion";
-import IngredientInput from "@/components/IngredientInput";
-import { useLoadingState } from "@/lib/hooks/useLoadingState";
+import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
 
 export default function CreateRecipe() {
   const [title, setTitle] = useState("");
@@ -15,6 +14,7 @@ export default function CreateRecipe() {
   const [cookingTime, setCookingTime] = useState("");
   const { isLoading, startLoading, stopLoading } = useLoadingState();
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const { isLoading, startLoading, stopLoading } = useLoadingState();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
