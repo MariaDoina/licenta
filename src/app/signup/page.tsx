@@ -1,34 +1,55 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import Button from "@/components/Button";
-import Image from "next/image";
-import axios from "axios";
-import { toast } from "react-hot-toast";
 import { useLoadingState } from "@/hooks/useLoadingState";
+import { useAuth } from "@/hooks/ApiRequests";
+import IconHeader from "@/components/ui/IconHeader";
+import Form from "@/components/forms/AuthForm";
+import { toast } from "react-hot-toast";
 
 export default function SignupPage() {
-  const router = useRouter();
-  const [user, setUser] = useState({
-    email: "",
-    password: "",
-    username: "",
-  });
+  const [user, setUser] = useState({ email: "", password: "", username: "" });
+  const { signup } = useAuth();
   const { isLoading, startLoading, stopLoading } = useLoadingState();
+  const router = useRouter();
 
-  const onSignup = async () => {
+  const handleChange = (name: string, value: string) => {
+    setUser((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // const validateUser = (user: { username: string; email: string; password: string }) => {
+  //   if (!user.username.trim()) {
+  //     toast.error("Username is required!");
+  //     return false;
+  //   }
+
+  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   if (!emailRegex.test(user.email)) {
+  //     toast.error("Please enter a valid email address!");
+  //     return false;
+  //   }
+
+  //   if (user.password.length < 6) {
+  //     toast.error("Password must be at least 6 characters long!");
+  //     return false;
+  //   }
+
+  //   return true;
+  // };
+
+  const handleSignup = async () => {
+    if (!user.username.trim() || !user.email.trim() || !user.password.trim()) {
+      toast.error("Please fill in all fields!");
+      return;
+    }
+
     try {
       startLoading();
-      const response = await axios.post("/api/users/signup", user);
-      console.log("Signup successful", response.data);
+      await signup(user);
       router.push("/login");
-      await toast.success("Signup successful");
     } catch (error: any) {
       console.log("Signup failed", error.message);
-      toast.error(
-        "A user with this email already exists. Please use a different email."
-      );
     } finally {
       stopLoading();
     }
@@ -38,111 +59,43 @@ export default function SignupPage() {
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-400 to-blue-500 p-6">
       <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-8 space-y-6">
         {/* Header Section */}
-        <div className="text-center mb-6">
-          <div className="flex justify-center mb-4">
-            <div className="h-20 w-20 rounded-full bg-white shadow-lg flex items-center justify-center">
-              <Image
-                src="/chef_hat_heart.svg"
-                alt="chef-hat"
-                width={100}
-                height={50}
-              />
-              {/* <ChefHat size={40} className="text-green-500" /> */}
-            </div>
-          </div>
-          <h1 className="text-3xl font-bold mb-2 text-gray-800">Sign Up</h1>
-          <p className="text-gray-600 text-sm">
-            Create an account to get started.
-          </p>
-        </div>
+        <IconHeader
+          iconSrc="/chef_hat_heart.svg"
+          alt="Chef Hat"
+          title="Sign Up"
+          description="Create an account to get started."
+        />
 
         {/* Form Section */}
-        {/* Username Field */}
-        <label
-          htmlFor="username"
-          className="block text-gray-700 font-medium mb-2"
-        >
-          Username
-        </label>
-        <div className="relative">
-          <Image
-            src="/user-signup.svg"
-            alt="user-icon"
-            width={20}
-            height={20}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2"
-          />
-
-          <input
-            className="w-full p-3 pl-10 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            type="text"
-            id="username"
-            value={user.username}
-            onChange={(e) => setUser({ ...user, username: e.target.value })}
-            placeholder="Enter your username"
-          />
-        </div>
-
-        {/* Email Field */}
-        <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
-          Email
-        </label>
-        <div className="relative">
-          <Image
-            src="/email.svg"
-            alt="email-icon"
-            width={20}
-            height={20}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2"
-          />
-
-          <input
-            className="w-full p-3 pl-10 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            type="email"
-            id="email"
-            value={user.email}
-            onChange={(e) => setUser({ ...user, email: e.target.value })}
-            placeholder="Enter your email"
-          />
-        </div>
-
-        {/* Password Field */}
-        <label
-          htmlFor="password"
-          className="block text-gray-700 font-medium mb-2"
-        >
-          Password
-        </label>
-        <div className="relative">
-          <Image
-            src="/password-lock.svg"
-            alt="password-icon"
-            width={20}
-            height={20}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2"
-          />
-
-          <input
-            className="w-full p-3 pl-10 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            type="password"
-            id="password"
-            value={user.password}
-            onChange={(e) => setUser({ ...user, password: e.target.value })}
-            placeholder="Enter your password"
-          />
-        </div>
-
-        {/* Submit Button */}
-        <div>
-          <Button
-            onClick={onSignup}
-            type="button"
-            loading={isLoading}
-            title={isLoading ? "Signing Up..." : "Sign Up"}
-            variant="btn_gradient_green_blue"
-            full
-          ></Button>
-        </div>
+        <Form
+          fields={[
+            {
+              name: "username",
+              type: "username",
+              placeholder: "Enter your username",
+              iconSrc: "/user-signup.svg",
+              value: user.username,
+            },
+            {
+              name: "email",
+              type: "email",
+              placeholder: "Enter your email",
+              iconSrc: "/email.svg",
+              value: user.email,
+            },
+            {
+              name: "password",
+              type: "password",
+              placeholder: "Enter your password",
+              iconSrc: "/password-lock.svg",
+              value: user.password,
+            },
+          ]}
+          onChange={handleChange}
+          onSubmit={handleSignup}
+          loading={isLoading}
+          buttonText="Sign Up"
+        />
 
         {/* Login Link */}
         <div className="text-center mt-4">

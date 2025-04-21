@@ -2,28 +2,34 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Button from "@/components/Button";
-import Image from "next/image";
 import axios from "axios";
+import { useAuth } from "@/hooks/ApiRequests";
 import { toast } from "react-hot-toast";
 import { useLoadingState } from "@/hooks/useLoadingState";
+import IconHeader from "@/components/ui/IconHeader";
+import Form from "@/components/forms/AuthForm";
 
 export default function ResetPasswordPage() {
-  const [token, setToken] = useState(""); // Set the token from the url
+  const { resetPassword } = useAuth();
+  const { isLoading, startLoading, stopLoading } = useLoadingState();
+  const router = useRouter();
+
+  const [token, setToken] = useState(""); // Extracted from URL
   const [passwords, setPasswords] = useState({
     newPassword: "",
     confirmPassword: "",
   });
-  const { isLoading, startLoading, stopLoading } = useLoadingState();
-  const router = useRouter();
 
-  // Extract token from url
+  const handleChange = (name: string, value: string) => {
+    setPasswords((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Extract token from URL
   useEffect(() => {
     const urlToken = window.location.search.split("=")[1];
     setToken(urlToken || "");
   }, []);
 
-  // Password validation
   const onResetPassword = async () => {
     if (passwords.newPassword !== passwords.confirmPassword) {
       toast.error("Passwords do not match. Please try again.");
@@ -32,18 +38,10 @@ export default function ResetPasswordPage() {
 
     try {
       startLoading();
-
-      // Trimiterea cererii pentru resetarea parolei
-      const response = await axios.post("/api/users/resetpassword", {
-        token,
-        newpassword: passwords.newPassword,
-      });
-
-      console.log("Password reset successful", response.data);
-      toast.success("Your password has been successfully changed!");
+      await resetPassword({ token, newpassword: passwords.newPassword });
       router.push("/login");
     } catch (error: any) {
-      toast.error("Failed to reset password. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       stopLoading();
     }
@@ -52,95 +50,36 @@ export default function ResetPasswordPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-400 to-blue-500 p-6">
       <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-8 space-y-6">
-        {/* Header Section */}
-        <div className="text-center mb-6">
-          <div className="flex justify-center mb-4">
-            <div className="h-20 w-20 rounded-full bg-white shadow-lg flex items-center justify-center">
-              <Image
-                src="/password-lock.svg"
-                alt="reset-password-icon"
-                width={100}
-                height={50}
-              />
-            </div>
-          </div>
-          <h1 className="text-3xl font-bold mb-2 text-gray-800">
-            Reset Password
-          </h1>
-          <p className="text-gray-600 text-sm">
-            Enter your new password below.
-          </p>
-        </div>
+        <IconHeader
+          iconSrc="/password-lock.svg"
+          alt="reset-password-icon"
+          title="Reset Password"
+          description="Enter your new password below."
+        />
 
-        {/* New Password Field */}
-        <label
-          htmlFor="newPassword"
-          className="block text-gray-700 font-medium mb-2"
-        >
-          New Password
-        </label>
-        <div className="relative">
-          <Image
-            src="/password-lock.svg"
-            alt="password-icon"
-            width={20}
-            height={20}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2"
-          />
+        <Form
+          fields={[
+            {
+              name: "newPassword",
+              type: "password",
+              placeholder: "Enter new password",
+              iconSrc: "/password-lock.svg",
+              value: passwords.newPassword,
+            },
+            {
+              name: "confirmPassword",
+              type: "password",
+              placeholder: "Confirm your new password",
+              iconSrc: "/password-lock.svg",
+              value: passwords.confirmPassword,
+            },
+          ]}
+          onChange={handleChange}
+          onSubmit={onResetPassword}
+          loading={isLoading}
+          buttonText="Reset Password"
+        />
 
-          <input
-            className="w-full p-3 pl-10 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            type="password"
-            id="newPassword"
-            value={passwords.newPassword}
-            onChange={(e) =>
-              setPasswords({ ...passwords, newPassword: e.target.value })
-            }
-            placeholder="Enter new password"
-          />
-        </div>
-
-        {/* Confirm Password Field */}
-        <label
-          htmlFor="confirmPassword"
-          className="block text-gray-700 font-medium mb-2"
-        >
-          Confirm Password
-        </label>
-        <div className="relative">
-          <Image
-            src="/password-lock.svg"
-            alt="password-icon"
-            width={20}
-            height={20}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2"
-          />
-
-          <input
-            className="w-full p-3 pl-10 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            type="password"
-            id="confirmPassword"
-            value={passwords.confirmPassword}
-            onChange={(e) =>
-              setPasswords({ ...passwords, confirmPassword: e.target.value })
-            }
-            placeholder="Confirm your new password"
-          />
-        </div>
-
-        {/* Submit Button */}
-        <div>
-          <Button
-            onClick={onResetPassword}
-            type="button"
-            loading={isLoading}
-            title={isLoading ? "Resetting..." : "Reset Password"}
-            variant="w-full py-3 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white rounded-lg shadow-md transition duration-300 flex items-center justify-center"
-            full
-          />
-        </div>
-
-        {/* Back to Login Link */}
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">
             Remembered your password?&nbsp;

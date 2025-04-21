@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
     const hashedpassword = await bcryptjs.hash(newpassword, salt);
 
     //update password
-
     user.password = hashedpassword;
     user.forgotPasswordToken = undefined;
     user.forgotPasswordTokenExpiry = undefined;

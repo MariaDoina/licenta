@@ -62,6 +62,7 @@
 ├─ /helpers  
 │ └─ getDataFromToken.ts  
 │ └─ mailer.ts  
+│ └─ verifyToken.ts // verify token and return a CustomJwtPayload with a field "id" used in api folder for createRecipe, auth_check
 │
 ├─ /hooks  
 │ └─ useLoadingState.ts  
