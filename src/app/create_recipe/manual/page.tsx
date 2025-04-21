@@ -6,7 +6,7 @@ import Image from "next/image";
 import Button from "@/components/Button";
 import { motion } from "framer-motion";
 import IngredientInput from "@/components/IngredientInput";
-import { useLoadingState } from "@/hooks/useLoadingState";
+import { useLoadingState } from "@/lib/hooks/useLoadingState";
 
 export default function CreateRecipe() {
   const [title, setTitle] = useState("");
@@ -14,6 +14,7 @@ export default function CreateRecipe() {
   const [instructions, setInstructions] = useState("");
   const [cookingTime, setCookingTime] = useState("");
   const { isLoading, startLoading, stopLoading } = useLoadingState();
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +24,8 @@ export default function CreateRecipe() {
       !title ||
       ingredientList.length === 0 ||
       !instructions ||
-      !cookingTime
+      !cookingTime ||
+      !imageFile
     ) {
       toast.error("Please fill all fields");
       stopLoading();
@@ -37,11 +39,23 @@ export default function CreateRecipe() {
     }
 
     try {
+      //Send photo to backend
+      const formData = new FormData();
+      formData.append("image", imageFile);
+
+      const imageUploadResponnse = await axios.post(
+        "/api/recipes/uploadImage",
+        formData
+      );
+      const imageUrl = imageUploadResponnse.data.imageUrl;
+
+      //Send rest of the recipe data to backend
       await axios.post("/api/recipes/createRecipe", {
         title,
         ingredients: ingredientList,
         instructions,
         cookingTime: cookingTimeNumber,
+        imageUrl,
       });
 
       toast.success("Recipe created successfully!");
@@ -51,11 +65,23 @@ export default function CreateRecipe() {
       setIngredientList([]);
       setInstructions("");
       setCookingTime("");
+      setImageFile(null);
     } catch (error: any) {
       toast.error("Error creating recipe. Please try again later.");
     } finally {
       stopLoading();
     }
+  };
+
+  const handleAddIngredient = () => {
+    if (ingredients.trim() !== "") {
+      setIngredientList((prev) => [...prev, ingredients.trim()]);
+      setIngredients("");
+    }
+  };
+
+  const handleRemoveIngredient = (index: number) => {
+    setIngredientList((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -156,6 +182,21 @@ export default function CreateRecipe() {
               </div>
             </div>
 
+            {/* Insert Image field */}
+            <div className="mb-4">
+              <h3 className="text-center mb-2">Upload Recipe Image</h3>
+              <input
+                type="file"
+                accept="image/*"
+                className="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                key={imageFile ? imageFile.name : "default"}
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setImageFile(e.target.files[0]);
+                  }
+                }}
+              />
+            </div>
             {/* Submit Button */}
             <Button
               type="submit"
