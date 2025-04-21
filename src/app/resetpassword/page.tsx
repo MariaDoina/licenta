@@ -3,9 +3,9 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { useAuth } from "@/hooks/ApiRequests";
+import { useAuth } from "@/app/lib/hooks/ApiRequests";
 import { toast } from "react-hot-toast";
-import { useLoadingState } from "@/hooks/useLoadingState";
+import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
 import IconHeader from "@/components/ui/IconHeader";
 import Form from "@/components/forms/AuthForm";
 

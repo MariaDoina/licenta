@@ -2,8 +2,8 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useLoadingState } from "@/hooks/useLoadingState";
-import { useAuth } from "@/hooks/ApiRequests";
+import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
+import { useAuth } from "@/app/lib/hooks/ApiRequests";
 import IconHeader from "@/components/ui/IconHeader";
 import Form from "@/components/forms/AuthForm";
 import { toast } from "react-hot-toast";

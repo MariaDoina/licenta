@@ -2,8 +2,8 @@
 import { toast } from "react-hot-toast";
 import { useState } from "react";
 import Button from "@/components/Button";
-import { useLoadingState } from "@/hooks/useLoadingState";
-import { useAuth } from "@/hooks/ApiRequests";
+import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
+import { useAuth } from "@/app/lib/hooks/ApiRequests";
 import IconHeader from "@/components/ui/IconHeader";
 import Form from "@/components/forms/AuthForm";
 

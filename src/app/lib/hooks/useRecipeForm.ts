@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { useLoadingState } from "@/hooks/useLoadingState";
+import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
 
 export function useRecipeForm(onSuccess?: () => void) {
   const [title, setTitle] = useState("");
