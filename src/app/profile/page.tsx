@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
 import Image from "next/image";
-import { useLoadingState } from "@/hooks/useLoadingState";
+import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
 
 type UserData = {
   _id: string;
