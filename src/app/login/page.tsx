@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
 import { useAuth } from "@/app/lib/hooks/ApiRequests";
-import IconHeader from "@/components/ui/IconHeader";
+import IconHeader from "@/components/LoginSignupUI/IconHeader";
 import Form from "@/components/forms/AuthForm";
 
 export default function LoginPage() {

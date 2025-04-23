@@ -13,6 +13,15 @@ const recipeSchema = new mongoose.Schema({
   },
   createdAt: { type: Date, default: Date.now },
   isGenerated: { type: Boolean, default: false },
+  difficulty: {
+    type: String,
+    enum: ["easy", "medium", "hard"],
+    required: true,
+  },
+  tags: {
+    type: [String],
+    default: [],
+  },
 });
 
 const Recipe =

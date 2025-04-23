@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import InputWithIcon from "@/components/ui/InputWithIcon";
+import InputWithIcon from "@/components/LoginSignupUI/InputWithIcon";
 import Button from "@/components/Button";
 
 interface Field {
