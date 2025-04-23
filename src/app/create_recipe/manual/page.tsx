@@ -14,6 +14,7 @@ export default function CreateRecipe() {
   const [instructions, setInstructions] = useState("");
   const [cookingTime, setCookingTime] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+
   const { isLoading, startLoading, stopLoading } = useLoadingState();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,6 +29,7 @@ export default function CreateRecipe() {
       !imageFile
     ) {
       toast.error("Please fill all fields");
+      stopLoading();
       return;
     }
 
@@ -39,7 +41,7 @@ export default function CreateRecipe() {
     }
 
     try {
-      //Send photo to backend
+      // Send photo to backend
       const formData = new FormData();
       formData.append("image", imageFile);
 
@@ -49,7 +51,7 @@ export default function CreateRecipe() {
       );
       const imageUrl = imageUploadResponnse.data.imageUrl;
 
-      //Send rest of the recipe data to backend
+      // Send rest of the recipe data to backend
       await axios.post("/api/recipes/createRecipe", {
         title,
         ingredients: ingredientList,
@@ -83,6 +85,13 @@ export default function CreateRecipe() {
 
   const handleRemoveIngredient = (index: number) => {
     setIngredientList((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+    }
   };
 
   return (
@@ -232,14 +241,10 @@ export default function CreateRecipe() {
                 type="file"
                 accept="image/*"
                 className="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                key={imageFile ? imageFile.name : "default"}
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    setImageFile(e.target.files[0]);
-                  }
-                }}
+                onChange={handleImageChange}
               />
             </div>
+
             {/* Submit Button */}
             <Button
               type="submit"

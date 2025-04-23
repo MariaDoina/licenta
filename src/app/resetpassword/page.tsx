@@ -6,7 +6,7 @@ import axios from "axios";
 import { useAuth } from "@/app/lib/hooks/ApiRequests";
 import { toast } from "react-hot-toast";
 import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
-import IconHeader from "@/components/ui/IconHeader";
+import IconHeader from "@/components/LoginSignupUI/IconHeader";
 import Form from "@/components/forms/AuthForm";
 
 export default function ResetPasswordPage() {

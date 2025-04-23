@@ -3,7 +3,7 @@ import axios from "axios";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import IconHeader from "@/components/ui/IconHeader";
+import IconHeader from "@/components/LoginSignupUI/IconHeader";
 
 export default function VerifyEmailPage() {
   const [token, setToken] = useState("");

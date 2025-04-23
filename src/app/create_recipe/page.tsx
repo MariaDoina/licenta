@@ -1,19 +1,28 @@
 "use client";
-
-import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 50 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut" },
-  },
-};
+import RecipeCard from "@/components/createRecipeUi/RecipeCard";
+import useRecipes from "../lib/hooks/useRecipes";
+import Link from "next/link";
 
 const CreateRecipe = () => {
+  const { recipes = [], loading, error } = useRecipes();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-100 to-blue-100">
+        <p className="text-lg text-gray-600">Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-lg text-red-600">{error}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-green-100 to-blue-100 px-4 py-16">
       <motion.h1
@@ -37,55 +46,64 @@ const CreateRecipe = () => {
         and organize your own favorite recipes.
       </motion.p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-4xl px-4">
-        {/* AI Card */}
-        <Link href="/create_recipe/ai">
-          <motion.div
-            variants={cardVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="rounded-2xl shadow-md bg-white p-8 flex flex-col items-center text-center hover:shadow-lg"
-          >
-            <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-blue-500 mb-4">
-              <Image src="/wand.svg" alt="AI Chef" width={32} height={32} />
-            </div>
-            <h2 className="text-3xl font-semibold text-gray-800 mb-2">
-              Generate with AI
-            </h2>
-            <p className="text-gray-600 text-md">
-              Let AI suggest recipes based on the ingredients you have or your
-              culinary preferences.
-            </p>
-          </motion.div>
-        </Link>
+      {/* Show recipes */}
+      <div className="w-full max-w-4xl px-4 mb-12">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+          Your Recipes
+        </h2>
 
-        {/* Manual Card */}
-        <Link href="/create_recipe/manual">
-          <motion.div
-            variants={cardVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="rounded-2xl shadow-md bg-white p-8 flex flex-col items-center text-center hover:shadow-lg"
-          >
-            <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-blue-500 mb-4">
-              <Image
-                src="/book.svg"
-                alt="Manual Recipe"
-                width={32}
-                height={32}
-              />
-            </div>
-            <h2 className="text-3xl font-semibold text-gray-800 mb-2">
-              Add your own recipes
-            </h2>
-            <p className="text-gray-600 text-md">
-              Prefer the classic way? Add your ingredients and instructions step
-              by step.
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          {recipes.length === 0 ? (
+            <p className="text-center text-gray-500">
+              No recipes available yet.
             </p>
-          </motion.div>
-        </Link>
+          ) : (
+            recipes.map((recipe) => (
+              <Link href={`/create_recipe/${recipe._id}`}>
+                <div
+                  key={recipe._id}
+                  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.03] transition-transform duration-300"
+                >
+                  {recipe.imageUrl ? (
+                    <img
+                      src={recipe.imageUrl}
+                      alt={recipe.title}
+                      className="w-full h-48 object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">
+                      No Image
+                    </div>
+                  )}
+                  <div className="p-4 text-center">
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      {recipe.title}
+                    </h3>
+                  </div>
+                </div>
+              </Link>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Creating new recipes */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-4xl px-4">
+        <RecipeCard
+          href="/create_recipe/ai"
+          imageSrc="/wand.svg"
+          altText="AI Chef"
+          title="Generate with AI"
+          description="Let AI suggest recipes based on the ingredients you have or your culinary preferences."
+        />
+
+        <RecipeCard
+          href="/create_recipe/manual"
+          imageSrc="/book.svg"
+          altText="Manual Recipe"
+          title="Add your own recipes"
+          description="Prefer the classic way? Add your ingredients and instructions step by step."
+        />
       </div>
     </div>
   );
