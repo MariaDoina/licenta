@@ -1,8 +1,7 @@
-import Features from "@/components/mainPage/Features";
-import HowToUse from "@/components/mainPage/HowToUse";
-import GetApp from "@/components/mainPage/GetApp";
-import Hero from "@/components/mainPage/Hero";
-import Image from "next/image";
+import Features from "@/containers/HomePage/Features";
+import HowToUse from "@/containers/HomePage/HowToUse";
+import GetApp from "@/containers/HomePage/GetApp";
+import Hero from "@/containers/HomePage/Hero";
 
 export default function Home() {
   return (

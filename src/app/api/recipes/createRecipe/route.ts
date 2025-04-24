@@ -1,7 +1,7 @@
 import { connect } from "@/db/dbConfig";
 import Recipe from "@/models/recipeModel";
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/app/lib/helpers/verifyToken";
+import { verifyToken } from "@/lib/helpers/verifyToken";
 
 connect();
 
@@ -27,12 +27,26 @@ export async function POST(request: NextRequest) {
       cookingTime,
       imageUrl,
       isGenerated = false,
+      difficulty,
+      tags = [],
     } = reqBody;
     console.log("Request body:", reqBody);
+
     // validate image just for recipes created by users
     if (!imageUrl && !isGenerated) {
       return NextResponse.json(
         { error: "Image is required for user-created recipes." },
+        { status: 400 }
+      );
+    }
+
+    //validate dificulty to be only one of the following: easy, medium, hard
+    if (!["easy", "medium", "hard"].includes(difficulty)) {
+      return NextResponse.json(
+        {
+          error:
+            "Invalid difficulty level. Please select 'easy', 'medium', or 'hard'.",
+        },
         { status: 400 }
       );
     }
@@ -46,6 +60,8 @@ export async function POST(request: NextRequest) {
       createdAt: new Date(),
       isGenerated,
       imageUrl,
+      difficulty,
+      tags,
     });
 
     console.log("Saving recipe with image:", {
@@ -54,6 +70,8 @@ export async function POST(request: NextRequest) {
       instructions,
       cookingTime,
       imageUrl,
+      difficulty,
+      tags,
     });
 
     const savedRecipe = await newRecipe.save();

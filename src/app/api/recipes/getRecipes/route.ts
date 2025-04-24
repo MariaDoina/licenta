@@ -6,7 +6,10 @@ connect();
 
 export async function GET() {
   try {
-    const recipes = await Recipe.find({}, "title imageUrl createdAt").sort({
+    const recipes = await Recipe.find(
+      {},
+      "title imageUrl cookingTime difficulty tags"
+    ).sort({
       createdAt: -1,
     });
 

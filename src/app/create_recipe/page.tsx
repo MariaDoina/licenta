@@ -1,7 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import RecipeCard from "@/components/createRecipeUi/RecipeCard";
-import useRecipes from "../lib/hooks/useRecipes";
+import useRecipes from "../../lib/hooks/useRecipes";
 import Link from "next/link";
 
 const CreateRecipe = () => {
@@ -59,11 +59,8 @@ const CreateRecipe = () => {
             </p>
           ) : (
             recipes.map((recipe) => (
-              <Link href={`/create_recipe/${recipe._id}`}>
-                <div
-                  key={recipe._id}
-                  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.03] transition-transform duration-300"
-                >
+              <Link key={recipe._id} href={`/create_recipe/${recipe._id}`}>
+                <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.03] transition-transform duration-300">
                   {recipe.imageUrl ? (
                     <img
                       src={recipe.imageUrl}
@@ -75,10 +72,36 @@ const CreateRecipe = () => {
                       No Image
                     </div>
                   )}
-                  <div className="p-4 text-center">
-                    <h3 className="text-lg font-semibold text-gray-800">
+                  <div className="p-4 space-y-2">
+                    <h3 className="text-lg font-semibold text-gray-800 text-center">
                       {recipe.title}
                     </h3>
+
+                    {/* Cooking Time & Difficulty */}
+                    <div className="flex justify-center items-center gap-4 text-sm text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <img src="/clock.svg" alt="clock" className="w-4 h-4" />
+                        <span>{recipe.cookingTime} min</span>
+                      </div>
+                      <span className="border-l h-4 border-gray-300"></span>
+                      <span className="text-indigo-600 font-medium">
+                        {recipe.difficulty}
+                      </span>
+                    </div>
+
+                    {/* Tags */}
+                    {recipe.tags && recipe.tags.length > 0 && (
+                      <div className="flex flex-wrap justify-center gap-2 mt-2">
+                        {recipe.tags.map((tag: string, index: number) => (
+                          <span
+                            key={index}
+                            className="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded-full"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </Link>

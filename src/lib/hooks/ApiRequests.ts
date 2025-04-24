@@ -1,7 +1,9 @@
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
-export const useAuth = () => {
+export const useApi = () => {
+  // Includes all the authentication related API requests
+  // such as signup, login, reset password, forgot password, and email verification.
   const signup = async (user: {
     email: string;
     password: string;
@@ -59,5 +61,32 @@ export const useAuth = () => {
     }
   };
 
-  return { signup, login, resetPassword, forgotPassword };
+  const verifyEmail = async (token: string) => {
+    try {
+      await axios.post("/api/users/verifyEmail", { token });
+      toast.success("Email successfully verified!");
+    } catch (error: any) {
+      toast.error("Token is invalid or has expired.");
+      throw error;
+    }
+  };
+
+  // Api requests to check is the user is authenticated or not
+  const checkAuth = async (): Promise<boolean> => {
+    try {
+      const response = await axios.get("/api/users/auth_check");
+      return response.data.success;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  return {
+    signup,
+    login,
+    resetPassword,
+    forgotPassword,
+    verifyEmail,
+    checkAuth,
+  };
 };

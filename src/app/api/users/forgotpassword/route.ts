@@ -1,8 +1,8 @@
+import { NextRequest, NextResponse } from "next/server";
+import { EmailType } from "@/constants/emailTypes";
+import { sendEmail } from "@/lib/helpers/mailer";
 import { connect } from "@/db/dbConfig";
 import User from "@/models/userModel";
-import { NextRequest, NextResponse } from "next/server";
-import { sendEmail } from "@/app/lib/helpers/mailer";
-import { EmailType } from "@/constants/emailTypes";
 
 connect();
 
@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
     const { email } = reqBody;
-    console.log("Emailu trimis de pe frontend", reqBody);
+    console.log("Email sent from frontend", reqBody);
 
     const user = await User.findOne({ email });
 
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: "email send successfull",
+      message: "email sent successfully",
       success: true,
     });
   } catch (error: any) {

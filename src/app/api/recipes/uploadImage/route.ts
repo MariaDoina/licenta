@@ -1,6 +1,6 @@
 import { connect } from "@/db/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
-import cloudinary from "@/app/lib/cloudinary";
+import cloudinary from "@/lib/cloudinary";
 
 connect();
 

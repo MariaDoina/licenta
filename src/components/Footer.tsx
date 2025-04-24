@@ -1,5 +1,9 @@
 "use client";
-import { FOOTER_CONTACT_INFO, FOOTER_LINKS, SOCIALS } from "@/constants";
+import {
+  FOOTER_CONTACT_INFO,
+  FOOTER_LINKS,
+  SOCIALS,
+} from "@/constants/HomePageSections";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";

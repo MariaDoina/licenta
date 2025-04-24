@@ -45,7 +45,7 @@ const Button = ({
     </button>
   );
 
-  // Dacă există un href, redirecționează cu Link
+  // If the href prop is provided, render a Link component
   if (href) {
     return <Link href={href}>{buttonContent}</Link>;
   }

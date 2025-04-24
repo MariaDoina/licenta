@@ -32,7 +32,12 @@ const RecipeDetailPage = () => {
     if (id) fetchRecipe();
   }, [id]);
 
-  if (loading) return <div className="p-10 text-center">Loading...</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-100 to-blue-100">
+        <p className="text-lg text-gray-600">Loading...</p>
+      </div>
+    );
   if (error || !recipe)
     return <div className="p-10 text-center text-red-600">{error}</div>;
 

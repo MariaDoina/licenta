@@ -5,6 +5,9 @@ interface Recipe {
   _id: string;
   title: string;
   imageUrl: string;
+  cookingTime: number;
+  difficulty: string;
+  tags: string[];
 }
 
 const useRecipes = () => {

@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import Image from "next/image";
 import Button from "@/components/Button";
 import { motion } from "framer-motion";
-import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
+import { useLoadingState } from "@/lib/hooks/useLoadingState";
 
 export default function CreateRecipe() {
   const [title, setTitle] = useState("");
@@ -14,12 +14,18 @@ export default function CreateRecipe() {
   const [instructions, setInstructions] = useState("");
   const [cookingTime, setCookingTime] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
+    "easy"
+  );
+  const [tags, setTags] = useState<string[]>([]); // Noua stare pentru tags
+  const [newTag, setNewTag] = useState(""); // Tag-ul curent pe care utilizatorul vrea sa-l adauge
 
   const { isLoading, startLoading, stopLoading } = useLoadingState();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     startLoading();
+
     // Validate inputs
     if (
       !title ||
@@ -58,6 +64,8 @@ export default function CreateRecipe() {
         instructions,
         cookingTime: cookingTimeNumber,
         imageUrl,
+        difficulty, // Adăugăm dificultatea
+        tags, // Adăugăm etichetele
       });
 
       toast.success("Recipe created successfully!");
@@ -69,6 +77,8 @@ export default function CreateRecipe() {
       setInstructions("");
       setCookingTime("");
       setImageFile(null);
+      setTags([]); // Reset tags
+      setNewTag(""); // Reset new tag input
     } catch (error: any) {
       toast.error("Error creating recipe. Please try again later.");
     } finally {
@@ -92,6 +102,19 @@ export default function CreateRecipe() {
       const file = e.target.files[0];
       setImageFile(file);
     }
+  };
+
+  const handleAddTag = () => {
+    if (newTag.trim() !== "" && !tags.includes(newTag.trim())) {
+      setTags((prev) => [...prev, newTag.trim()]);
+      setNewTag("");
+    } else {
+      toast.error("Please enter a valid tag or tag already added.");
+    }
+  };
+
+  const handleRemoveTag = (index: number) => {
+    setTags((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -153,7 +176,6 @@ export default function CreateRecipe() {
                 />
               </div>
             </div>
-
             {/* Ingredients Field */}
             <div className="mb-4">
               <h3 className="text-center mb-2">Ingredients</h3>
@@ -174,8 +196,7 @@ export default function CreateRecipe() {
                 />
               </div>
             </div>
-
-            {/* Display Added Ingredients */}
+            {/* Display Added Ingredients */} {/* Display Added Ingredients */}
             {ingredientList.length > 0 && (
               <div className="mb-4 flex flex-wrap gap-2">
                 {ingredientList.map((ingredient, index) => (
@@ -200,7 +221,90 @@ export default function CreateRecipe() {
                 ))}
               </div>
             )}
-
+            {/* Difficulty Selector */}
+            <div className="mb-4">
+              <h3 className="text-center mb-2">Difficulty Level</h3>
+              <div className="flex justify-center space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setDifficulty("easy")}
+                  className={`p-3 w-24 text-center rounded-lg ${
+                    difficulty === "easy"
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-200"
+                  }`}
+                >
+                  Easy
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDifficulty("medium")}
+                  className={`p-3 w-24 text-center rounded-lg ${
+                    difficulty === "medium"
+                      ? "bg-yellow-500 text-white"
+                      : "bg-gray-200"
+                  }`}
+                >
+                  Medium
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDifficulty("hard")}
+                  className={`p-3 w-24 text-center rounded-lg ${
+                    difficulty === "hard"
+                      ? "bg-red-500 text-white"
+                      : "bg-gray-200"
+                  }`}
+                >
+                  Hard
+                </button>
+              </div>
+            </div>
+            {/* Tags Field */}
+            <div className="mb-4">
+              <h3 className="text-center mb-2">Tags</h3>
+              <div className="flex items-center space-x-3">
+                <input
+                  type="text"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  placeholder="Enter a tag"
+                  className="w-full p-3 pl-5 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+                <Button
+                  type="button"
+                  icon="/plus.svg"
+                  title="Add Tag"
+                  variant="btn_small_gradient sm: pr-10"
+                  onClick={handleAddTag}
+                />
+              </div>
+            </div>
+            {/* Display Added Tags */}
+            {tags.length > 0 && (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {tags.map((tag, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center bg-gray-200 px-4 py-2 rounded-lg"
+                  >
+                    <span className="text-sm">{tag}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTag(index)}
+                      className="ml-2 text-red-500 hover:text-red-700 cursor-pointer"
+                    >
+                      <Image
+                        src="/close.svg"
+                        alt="close-icon"
+                        width={16}
+                        height={16}
+                      />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
             {/* Instructions Field */}
             <div className="mb-4">
               <h3 className="text-center mb-2">Cooking Instructions</h3>
@@ -212,7 +316,6 @@ export default function CreateRecipe() {
                 rows={5}
               />
             </div>
-
             {/* Cooking Time Field */}
             <div className="mb-4">
               <h3 className="text-center mb-2">Cooking Time (minutes)</h3>
@@ -233,7 +336,6 @@ export default function CreateRecipe() {
                 />
               </div>
             </div>
-
             {/* Insert Image field */}
             <div className="mb-4">
               <h3 className="text-center mb-2">Upload Recipe Image</h3>
@@ -244,7 +346,6 @@ export default function CreateRecipe() {
                 onChange={handleImageChange}
               />
             </div>
-
             {/* Submit Button */}
             <Button
               type="submit"

@@ -1,23 +1,31 @@
 "use client";
-import Link from "next/link";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
-import { useAuth } from "@/app/lib/hooks/ApiRequests";
 import IconHeader from "@/components/LoginSignupUI/IconHeader";
+import { useLoadingState } from "@/lib/hooks/useLoadingState";
+import { useApi } from "@/lib/hooks/ApiRequests";
 import Form from "@/components/forms/AuthForm";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { toast } from "react-hot-toast";
+import Link from "next/link";
 
 export default function LoginPage() {
-  const [user, setUser] = useState({ email: "", password: "" });
-  const { login } = useAuth();
   const { isLoading, startLoading, stopLoading } = useLoadingState();
+  const [user, setUser] = useState({ email: "", password: "" });
+  const { login } = useApi();
   const router = useRouter();
 
+  // Info to be sent to the backend
   const handleChange = (name: string, value: string) => {
     setUser((prev) => ({ ...prev, [name]: value }));
   };
 
+  //Api call to login the user
   const handleLogin = async () => {
+    if (!user.email.trim() || !user.password.trim()) {
+      toast.error("Please fill in all fields!");
+      return;
+    }
+
     try {
       startLoading();
       await login(user);

@@ -19,7 +19,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* Showing Navbar only if they're not the routes i specified */}
         <Navbar />
         <main className="relative overlfow-hidden">
           {children}

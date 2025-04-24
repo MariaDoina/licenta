@@ -1,17 +1,18 @@
 "use client";
+import IconHeader from "@/components/LoginSignupUI/IconHeader";
+import { useLoadingState } from "@/lib/hooks/useLoadingState";
+import { useApi } from "@/lib/hooks/ApiRequests";
+import Form from "@/components/forms/AuthForm";
+import Button from "@/components/Button";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
-import Button from "@/components/Button";
-import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
-import { useAuth } from "@/app/lib/hooks/ApiRequests";
-import IconHeader from "@/components/LoginSignupUI/IconHeader";
-import Form from "@/components/forms/AuthForm";
 
 export default function ForgotPasswordPage() {
-  const [user, setUser] = useState({ email: "" });
-  const { forgotPassword } = useAuth();
   const { isLoading, startLoading, stopLoading } = useLoadingState();
+  const [user, setUser] = useState({ email: "" });
+  const { forgotPassword } = useApi();
 
+  // Info to be sent to the backend
   const handleChange = (name: string, value: string) => {
     setUser((prev) => ({ ...prev, [name]: value }));
   };

@@ -1,20 +1,19 @@
 "use client";
-import Link from "next/link";
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import axios from "axios";
-import { useAuth } from "@/app/lib/hooks/ApiRequests";
-import { toast } from "react-hot-toast";
-import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
 import IconHeader from "@/components/LoginSignupUI/IconHeader";
+import { useLoadingState } from "@/lib/hooks/useLoadingState";
+import React, { useState, useEffect } from "react";
+import { useApi } from "@/lib/hooks/ApiRequests";
 import Form from "@/components/forms/AuthForm";
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
+import Link from "next/link";
 
 export default function ResetPasswordPage() {
-  const { resetPassword } = useAuth();
   const { isLoading, startLoading, stopLoading } = useLoadingState();
+  const [token, setToken] = useState(""); // Extracted from URL
+  const { resetPassword } = useApi();
   const router = useRouter();
 
-  const [token, setToken] = useState(""); // Extracted from URL
   const [passwords, setPasswords] = useState({
     newPassword: "",
     confirmPassword: "",

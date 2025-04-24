@@ -1,48 +1,51 @@
 "use client";
-import Link from "next/link";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
-import { useAuth } from "@/app/lib/hooks/ApiRequests";
 import IconHeader from "@/components/LoginSignupUI/IconHeader";
+import { useLoadingState } from "@/lib/hooks/useLoadingState";
+import { useApi } from "@/lib/hooks/ApiRequests";
 import Form from "@/components/forms/AuthForm";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 import { toast } from "react-hot-toast";
+import Link from "next/link";
 
 export default function SignupPage() {
   const [user, setUser] = useState({ email: "", password: "", username: "" });
-  const { signup } = useAuth();
   const { isLoading, startLoading, stopLoading } = useLoadingState();
+  const { signup } = useApi();
   const router = useRouter();
 
+  // Info to be sent to the backend
   const handleChange = (name: string, value: string) => {
     setUser((prev) => ({ ...prev, [name]: value }));
   };
 
-  // const validateUser = (user: { username: string; email: string; password: string }) => {
-  //   if (!user.username.trim()) {
-  //     toast.error("Username is required!");
-  //     return false;
-  //   }
+  // Validation function to check if the user input is valid
+  const validateUser = (user: {
+    username: string;
+    email: string;
+    password: string;
+  }) => {
+    if (!user.username.trim()) {
+      toast.error("Username is required!");
+      return false;
+    }
 
-  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //   if (!emailRegex.test(user.email)) {
-  //     toast.error("Please enter a valid email address!");
-  //     return false;
-  //   }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(user.email)) {
+      toast.error("Please enter a valid email address!");
+      return false;
+    }
 
-  //   if (user.password.length < 6) {
-  //     toast.error("Password must be at least 6 characters long!");
-  //     return false;
-  //   }
+    if (user.password.length < 8) {
+      toast.error("Password must be at least 8 characters long!");
+      return false;
+    }
 
-  //   return true;
-  // };
+    return true;
+  };
 
   const handleSignup = async () => {
-    if (!user.username.trim() || !user.email.trim() || !user.password.trim()) {
-      toast.error("Please fill in all fields!");
-      return;
-    }
+    if (!validateUser(user)) return;
 
     try {
       startLoading();

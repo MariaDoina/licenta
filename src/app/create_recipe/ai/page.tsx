@@ -3,7 +3,7 @@ import Button from "@/components/Button";
 import { motion } from "framer-motion";
 import React, { useState } from "react";
 import IngredientInput from "@/components/IngredientInput";
-import { useLoadingState } from "@/app/lib/hooks/useLoadingState";
+import { useLoadingState } from "@/lib/hooks/useLoadingState";
 import axios from "axios";
 import toast from "react-hot-toast";
 

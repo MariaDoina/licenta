@@ -1,24 +1,23 @@
 "use client";
-import axios from "axios";
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import IconHeader from "@/components/LoginSignupUI/IconHeader";
+import React, { useEffect, useState } from "react";
+import { useApi } from "@/lib/hooks/ApiRequests";
+import Link from "next/link";
 
 export default function VerifyEmailPage() {
-  const [token, setToken] = useState("");
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState(false);
+  const [token, setToken] = useState("");
+  const { verifyEmail } = useApi();
 
   const verifyUserEmail = async () => {
     if (!token) return;
 
     try {
-      await axios.post("/api/users/verifyEmail", { token });
+      await verifyEmail(token);
       setVerified(true);
     } catch (error: any) {
       setError(true);
-      toast.error("Token is invalid or has expired.");
     }
   };
 

@@ -1,20 +1,23 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useApi } from "@/lib/hooks/ApiRequests";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+import { NAV_LINKS } from "../constants/HomePageSections";
 import { toast } from "react-hot-toast";
-import { NAV_LINKS } from "../constants";
-import Image from "next/image";
-import Link from "next/link";
-import Button from "./Button";
-import axios from "axios";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import Button from "./Button";
+import Link from "next/link";
+import axios from "axios";
+import { set } from "mongoose";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const pathname = usePathname();
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [showNavbar, setShowNavbar] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const { checkAuth } = useApi();
+  const pathname = usePathname();
 
   //use Effect to make navbar appear or dissapear
   useEffect(() => {
@@ -42,15 +45,11 @@ const Navbar = () => {
 
   // Check user authentication
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await axios.get("/api/users/auth_check");
-        setIsAuthenticated(response.data.success);
-      } catch (error) {
-        setIsAuthenticated(false);
-      }
+    const checkAuthentication = async () => {
+      const isAuth = await checkAuth();
+      setIsAuthenticated(isAuth);
     };
-    checkAuth();
+    checkAuthentication();
   }, [pathname]);
 
   // Check if the user is authenticated if not show them a message as to why they can't access other links
