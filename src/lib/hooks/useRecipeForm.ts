@@ -1,15 +1,17 @@
 import { useState } from "react";
-import axios from "axios";
-import { toast } from "react-hot-toast";
-import { useLoadingState } from "@/lib/hooks/useLoadingState";
 
-export function useRecipeForm(onSuccess?: () => void) {
+export const useRecipeForm = () => {
   const [title, setTitle] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [ingredientList, setIngredientList] = useState<string[]>([]);
   const [instructions, setInstructions] = useState("");
   const [cookingTime, setCookingTime] = useState("");
-  const { isLoading, startLoading, stopLoading } = useLoadingState();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
+    "easy"
+  );
+  const [tags, setTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
 
   const handleAddIngredient = () => {
     if (ingredients.trim() !== "") {
@@ -22,49 +24,15 @@ export function useRecipeForm(onSuccess?: () => void) {
     setIngredientList((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (
-      !title ||
-      ingredientList.length === 0 ||
-      !instructions ||
-      !cookingTime
-    ) {
-      toast.error("Please fill all fields");
-      return;
-    }
-
-    const cookingTimeNumber = parseInt(cookingTime);
-    if (isNaN(cookingTimeNumber)) {
-      toast.error("Cooking time must be a number");
-      return;
-    }
-
-    try {
-      startLoading();
-      await axios.post("/api/recipes/createRecipe", {
-        title,
-        ingredients: ingredientList,
-        instructions,
-        cookingTime: cookingTimeNumber,
-      });
-      toast.success("Recipe created successfully!");
-      resetForm();
-      onSuccess?.();
-    } catch (error) {
-      toast.error("Error creating recipe. Please try again later.");
-    } finally {
-      stopLoading();
+  const handleAddTag = () => {
+    if (newTag.trim() !== "" && !tags.includes(newTag.trim())) {
+      setTags((prev) => [...prev, newTag.trim()]);
+      setNewTag("");
     }
   };
 
-  const resetForm = () => {
-    setTitle("");
-    setIngredients("");
-    setIngredientList([]);
-    setInstructions("");
-    setCookingTime("");
+  const handleRemoveTag = (index: number) => {
+    setTags((prev) => prev.filter((_, i) => i !== index));
   };
 
   return {
@@ -73,13 +41,22 @@ export function useRecipeForm(onSuccess?: () => void) {
     ingredients,
     setIngredients,
     ingredientList,
-    handleAddIngredient,
-    handleRemoveIngredient,
+    setIngredientList,
     instructions,
     setInstructions,
     cookingTime,
     setCookingTime,
-    handleSubmit,
-    isLoading,
+    imageFile,
+    setImageFile,
+    difficulty,
+    setDifficulty,
+    tags,
+    setTags,
+    newTag,
+    setNewTag,
+    handleAddIngredient,
+    handleRemoveIngredient,
+    handleAddTag,
+    handleRemoveTag,
   };
-}
+};

@@ -1,11 +1,30 @@
 "use client";
+import { useEffect, useState } from "react";
+import { useApi } from "@/lib/hooks/ApiRequests";
 import { motion } from "framer-motion";
-import RecipeCard from "@/components/createRecipeUi/RecipeCard";
-import useRecipes from "../../lib/hooks/useRecipes";
-import Link from "next/link";
+import RecipeCard from "@/components/RecipeUI/CreateRecipeCard";
+import RecipeList, { Recipe } from "@/components/RecipeUI/RecipeList";
 
 const CreateRecipe = () => {
-  const { recipes = [], loading, error } = useRecipes();
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const { getRecipes } = useApi();
+
+  useEffect(() => {
+    setLoading(true);
+    getRecipes()
+      .then((data) => {
+        setRecipes(data);
+      })
+      .catch((err) => {
+        setError(err.message || "Failed to fetch recipes.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   if (loading) {
     return (
@@ -46,71 +65,9 @@ const CreateRecipe = () => {
         and organize your own favorite recipes.
       </motion.p>
 
-      {/* Show recipes */}
-      <div className="w-full max-w-4xl px-4 mb-12">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-          Your Recipes
-        </h2>
+      {/* Show Recipes */}
+      <RecipeList recipes={recipes} />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {recipes.length === 0 ? (
-            <p className="text-center text-gray-500">
-              No recipes available yet.
-            </p>
-          ) : (
-            recipes.map((recipe) => (
-              <Link key={recipe._id} href={`/create_recipe/${recipe._id}`}>
-                <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.03] transition-transform duration-300">
-                  {recipe.imageUrl ? (
-                    <img
-                      src={recipe.imageUrl}
-                      alt={recipe.title}
-                      className="w-full h-48 object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">
-                      No Image
-                    </div>
-                  )}
-                  <div className="p-4 space-y-2">
-                    <h3 className="text-lg font-semibold text-gray-800 text-center">
-                      {recipe.title}
-                    </h3>
-
-                    {/* Cooking Time & Difficulty */}
-                    <div className="flex justify-center items-center gap-4 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <img src="/clock.svg" alt="clock" className="w-4 h-4" />
-                        <span>{recipe.cookingTime} min</span>
-                      </div>
-                      <span className="border-l h-4 border-gray-300"></span>
-                      <span className="text-indigo-600 font-medium">
-                        {recipe.difficulty}
-                      </span>
-                    </div>
-
-                    {/* Tags */}
-                    {recipe.tags && recipe.tags.length > 0 && (
-                      <div className="flex flex-wrap justify-center gap-2 mt-2">
-                        {recipe.tags.map((tag: string, index: number) => (
-                          <span
-                            key={index}
-                            className="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded-full"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Creating new recipes */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-4xl px-4">
         <RecipeCard
           href="/create_recipe/ai"

@@ -9,9 +9,18 @@ if (!MONGO_URI) {
 // Keep a module-level variable to track the connection
 let isConnected = false;
 
+//conncet only one time to the database
+mongoose.connection.on("connected", () => {
+  console.log("MongoDB connected");
+});
+
+mongoose.connection.on("error", (err) => {
+  console.error("MongoDB connection error:", err);
+});
+
 export const connect = async () => {
   if (isConnected) {
-    // Avoid creating a new connection if already connected
+    // Avoid creating a new connection if already connecteda
     return mongoose.connection;
   }
 
@@ -19,14 +28,6 @@ export const connect = async () => {
     const db = await mongoose.connect(MONGO_URI, {});
 
     isConnected = true;
-
-    mongoose.connection.on("connected", () => {
-      console.log("MongoDB connected");
-    });
-
-    mongoose.connection.on("error", (err) => {
-      console.error("MongoDB connection error:", err);
-    });
 
     return db.connection;
   } catch (error) {

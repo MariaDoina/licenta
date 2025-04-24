@@ -20,11 +20,12 @@ const HowToUse = () => {
     <section className="max-container padding-container flex flex-col p-10 xl:px-30">
       <div>
         <p className="text-xl pb-5">
-          Turn your kitchen into a gourmet haven with SmartBite! Simply enter
-          the ingredients you have, and our advanced AI will craft delicious,
-          personalized recipes just for you. Whether you're a beginner or a
-          seasoned chef, SmartBite makes cooking effortless and fun. Say goodbye
-          to food waste and hello to endless culinary inspiration!
+          Turn your kitchen into a gourmet haven with SmartBite! Whether you
+          prefer generating personalized recipes with the power of AI or
+          crafting your own from scratch, SmartBite gives you the freedom to
+          cook your way. Just enter the ingredients you have or write your own
+          recipe—perfect for both beginners and seasoned chefs. Say goodbye to
+          food waste and hello to endless culinary inspiration!
         </p>
       </div>
 
@@ -40,8 +41,8 @@ const HowToUse = () => {
           variants={listVariants}
         >
           {[
-            "✔ Input Your Ingredients – Just enter what you have on hand, and let our AI do the rest.",
-            "✔ Generate a Recipe – Watch as our AI crafts a detailed, step-by-step recipe tailored to your ingredients.",
+            "✔ Input Your Ingredients – Enter what you have on hand or write your own recipe from scratch.",
+            "✔ Generate a Recipe – Watch as our AI crafts a detailed, step-by-step recipe tailored to your ingredients, or take full control and write your own.",
             "✔ Visualize Your Dish – Get a mouth-watering, AI-generated image to see what’s cooking before you even start.",
             "✔ Cook & Enjoy – Follow the recipe and savor a delicious, customized meal!",
           ].map((text, index) => (

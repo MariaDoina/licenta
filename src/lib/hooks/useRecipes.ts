@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useApi } from "./ApiRequests";
 
 interface Recipe {
   _id: string;
@@ -11,16 +11,16 @@ interface Recipe {
 }
 
 const useRecipes = () => {
+  const { getRecipes } = useApi();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchRecipes = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get("/api/recipes/getRecipes");
-        console.log("See what the response is ", response.data);
-        setRecipes(response.data);
+        const data = await getRecipes();
+        setRecipes(data);
       } catch (err: any) {
         setError(err.message || "Failed to fetch recipes.");
       } finally {
@@ -28,7 +28,7 @@ const useRecipes = () => {
       }
     };
 
-    fetchRecipes();
+    fetchData();
   }, []);
 
   return { recipes, loading, error };

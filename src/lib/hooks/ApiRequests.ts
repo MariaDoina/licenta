@@ -81,6 +81,16 @@ export const useApi = () => {
     }
   };
 
+  //Api request to get recipes
+  const getRecipes = async () => {
+    try {
+      const response = await axios.get("/api/recipes/getRecipes");
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.message || "Failed to fetch recipes.");
+    }
+  };
+
   return {
     signup,
     login,
@@ -88,5 +98,6 @@ export const useApi = () => {
     forgotPassword,
     verifyEmail,
     checkAuth,
+    getRecipes,
   };
 };

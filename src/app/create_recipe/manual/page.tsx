@@ -17,9 +17,8 @@ export default function CreateRecipe() {
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
     "easy"
   );
-  const [tags, setTags] = useState<string[]>([]); // Noua stare pentru tags
-  const [newTag, setNewTag] = useState(""); // Tag-ul curent pe care utilizatorul vrea sa-l adauge
-
+  const [tags, setTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
   const { isLoading, startLoading, stopLoading } = useLoadingState();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,8 +63,8 @@ export default function CreateRecipe() {
         instructions,
         cookingTime: cookingTimeNumber,
         imageUrl,
-        difficulty, // Adăugăm dificultatea
-        tags, // Adăugăm etichetele
+        difficulty,
+        tags,
       });
 
       toast.success("Recipe created successfully!");

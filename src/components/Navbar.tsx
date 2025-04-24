@@ -8,8 +8,6 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Button from "./Button";
 import Link from "next/link";
-import axios from "axios";
-import { set } from "mongoose";
 
 const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
