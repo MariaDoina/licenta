@@ -8,12 +8,20 @@ export async function GET(
 ) {
   const { id } = await context.params;
 
-  await connect();
-  const recipe = await Recipe.findById(id);
+  try {
+    await connect();
 
-  if (!recipe) {
-    return NextResponse.json({ error: "Recipe not found" }, { status: 404 });
+    const recipe = await Recipe.findById(id).populate("userOwner", "username");
+
+    if (!recipe) {
+      return NextResponse.json({ error: "Recipe not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(recipe);
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || "Something went wrong." },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json(recipe);
 }

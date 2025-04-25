@@ -91,6 +91,16 @@ export const useApi = () => {
     }
   };
 
+  // Api request to get a single recipe by id
+  const getRecipeById = async (id: string) => {
+    try {
+      const response = await axios.get(`/api/recipes/${id}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.message || "Could not fetch recipe.");
+    }
+  };
+
   return {
     signup,
     login,
@@ -99,5 +109,6 @@ export const useApi = () => {
     verifyEmail,
     checkAuth,
     getRecipes,
+    getRecipeById,
   };
 };
