@@ -1,6 +1,8 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
 import useRecipe from "@/lib/hooks/useRecipe";
+import Button from "@/components/Button";
+import Image from "next/image";
 
 const RecipeDetailPage = () => {
   const { id } = useParams();
@@ -31,80 +33,130 @@ const RecipeDetailPage = () => {
   } = recipe;
 
   return (
-    <div className="min-h-screen bg-white p-6">
-      <button
-        onClick={() => router.push("/recipes")}
-        className="mb-6 px-4 py-2 bg-blue-100 text-blue-800 font-medium rounded-md hover:bg-blue-200 transition"
-      >
-        ← Back to Recipes
-      </button>
+    <div className="min-h-screen p-6 bg-gradient-to-br from-green-100 to-blue-100">
+      {/* Back Button */}
+      <div className="max-w-4xl mx-auto mb-6">
+        <Button
+          type="button"
+          title="Back to Recipes"
+          icon="/arrow-left.svg"
+          variant="btn_white_recipe"
+          onClick={() => router.push("/create_recipe")}
+        />
+      </div>
 
-      <h1 className="text-4xl font-bold text-center mb-6">{title}</h1>
-
-      {imageUrl && (
-        <div className="relative max-w-3xl mx-auto mb-6">
-          <img
-            src={imageUrl}
-            alt={title}
-            className="w-full rounded-2xl shadow"
-          />
-          {difficulty && (
-            <span className="absolute top-4 right-4 bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-1 rounded-full shadow">
-              {difficulty}
-            </span>
-          )}
-        </div>
-      )}
-
-      <div className="max-w-2xl mx-auto space-y-6 text-gray-700">
-        <div className="flex items-center flex-wrap gap-3">
-          {cookingTime && (
-            <span className="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
-              ⏱ {cookingTime} mins
-            </span>
-          )}
-          {isGenerated && (
-            <span className="bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">
-              🤖 AI Generated
-            </span>
-          )}
-          {!isGenerated && userOwner && (
-            <div className="text-center text-sm text-gray-500 mb-2">
-              By {recipe.userOwner?.username || "Unknown chef"}
-            </div>
-          )}
-          {createdAt && (
-            <span className="bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded-full">
-              📅 {new Date(createdAt).toLocaleDateString()}
-            </span>
-          )}
-        </div>
-
-        {tags?.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {tags.map((tag, idx) => (
-              <span
-                key={idx}
-                className="bg-gray-200 text-gray-800 text-sm px-3 py-1 rounded-full"
-              >
-                #{tag}
+      {/* Recipe Card */}
+      <div className="relative max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        {/* Recipe Image and Difficulty Badge */}
+        {imageUrl && (
+          <div className="relative">
+            <img
+              src={imageUrl}
+              alt={title}
+              className="w-full h-[300px] object-cover rounded-t-lg"
+            />
+            {difficulty && (
+              <span className="absolute top-4 right-4 bg-gray-50 text-md text-gray-700 font-medium capitalize px-3 py-1 rounded-full border-none shadow">
+                {difficulty}
               </span>
-            ))}
+            )}
+            <div className="absolute bottom-4 left-4 text-white text-4xl font-bold drop-shadow-lg">
+              {title}
+            </div>
           </div>
         )}
 
-        <div>
-          <h2 className="text-2xl font-semibold mb-2">Ingredients:</h2>
-          <ul className="list-disc list-inside space-y-1">
-            {ingredients?.map((ingredient, idx) => (
-              <li key={idx}>{ingredient}</li>
-            ))}
-          </ul>
-        </div>
+        <div className="p-6 bg-white">
+          {/* Time, author, data */}
+          <div className="flex flex-col items-start gap-4 mb-8">
+            <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
+              {cookingTime && (
+                <div className="flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1 rounded-full">
+                  <Image
+                    src="/clock.svg"
+                    alt="Clock icon"
+                    width={20}
+                    height={20}
+                  />
+                  <span>{cookingTime} mins</span>
+                </div>
+              )}
+              <div className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                <span role="img" aria-label="chef">
+                  <Image
+                    src="/chef.svg"
+                    alt="Chef icon"
+                    width={20}
+                    height={20}
+                  />
+                </span>
+                <span>By {userOwner?.username || "Unknown chef"}</span>
+              </div>
+              {createdAt && (
+                <div className="flex items-center gap-2 bg-gray-100 text-gray-800 px-3 py-1 rounded-full">
+                  <span role="img" aria-label="calendar">
+                    <Image
+                      src="/calendar.svg"
+                      alt="Calendar icon"
+                      width={20}
+                      height={20}
+                    />
+                  </span>
+                  <span>{new Date(createdAt).toLocaleDateString()}</span>
+                </div>
+              )}
+            </div>
 
-        <div>
-          <h2 className="text-2xl font-semibold mb-2">Instructions:</h2>
-          <p>{instructions || "No instructions provided."}</p>
+            {/* Tags */}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {tags.map((tag, idx) => (
+                  <span
+                    key={idx}
+                    className="bg-gray-200 text-gray-700 text-md px-3 py-1 rounded-full flex items-center gap-2"
+                  >
+                    <Image
+                      src="/label.svg"
+                      alt="Tag icon"
+                      width={20}
+                      height={20}
+                    />
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* AI Generated Badge */}
+          {isGenerated && (
+            <div className="text-left mb-8">
+              <span className="bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">
+                🤖 AI Generated
+              </span>
+            </div>
+          )}
+
+          {/* Ingredients and Instructions */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6  w-full mx-auto">
+            {/* Ingredients */}
+            <div className="md:col-span-2">
+              <h2 className="text-2xl font-semibold mb-3">Ingredients</h2>
+              <ul className="list-disc list-inside marker:text-green-600 space-y-2 text-gray-700">
+                {ingredients?.map((ingredient, idx) => (
+                  <li key={idx}>{ingredient}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Instructions */}
+            <div className="md:col-span-3">
+              <h2 className="text-2xl font-semibold mb-3">Instructions</h2>
+              <p className="leading-relaxed text-gray-700">
+                {instructions || "No instructions provided."}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

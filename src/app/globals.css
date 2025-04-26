@@ -18,8 +18,14 @@
   .btn_white_text {
     @apply bg-white text-gray-800 border border-none px-8 py-3 hover:bg-gray-50 rounded-full;
   }
+
+  .btn_white_recipe {
+    @apply bg-white border-none  px-4 py-2 rounded-md shadow hover:bg-gray-100 hover:text-gray-900 focus:outline-none;
+  }
+
   /* .btn_gray {
     @apply bg-gray-150 px-8 py-4 text-white transition-all hover:bg-black;
+         ;
   } */
 
   .btn_red {

@@ -16,11 +16,25 @@ type UserData = {
   specialties: string[];
 };
 
+type Recipe = {
+  _id: string;
+  title: string;
+  description?: string;
+  userOwner:
+    | string
+    | {
+        _id: string;
+        username: string;
+        email?: string;
+      };
+};
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loadingRecipes, setLoadingRecipes] = useState(false);
 
-  const [isEditing, setIsEditing] = useState(false); // State for editing
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     about: "",
     specialties: "",
@@ -56,6 +70,23 @@ export default function ProfilePage() {
     }
   };
 
+  const getUserRecipes = async () => {
+    try {
+      setLoadingRecipes(true);
+      if (!user?._id) return;
+      const res = await axios.get("/api/recipes/getUserRecipe");
+      const userRecipes = res.data.recipes.filter(
+        (recipe: Recipe) => recipe.userOwner === user._id
+      );
+      setRecipes(res.data.recipes || []);
+    } catch (error: any) {
+      console.log(error.message);
+      toast.error("Failed to fetch recipes");
+    } finally {
+      setLoadingRecipes(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -76,10 +107,10 @@ export default function ProfilePage() {
         about: formData.about,
         specialties: specialtiesArray,
       };
-      await axios.put("/api/users/updateProfile", updatedUser); // Call API endpoint
+      await axios.put("/api/users/updateProfile", updatedUser);
       toast.success("Profile updated successfully");
-      setIsEditing(false); // Switch off editing mode
-      getUserDetails(); // Refresh the user data
+      setIsEditing(false);
+      getUserDetails();
     } catch (error: any) {
       console.log(error.message);
       toast.error("Failed to update profile");
@@ -101,6 +132,12 @@ export default function ProfilePage() {
     getUserDetails();
   }, []);
 
+  useEffect(() => {
+    if (user?._id) {
+      getUserRecipes();
+    }
+  }, [user]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-4">
       <div className="relative h-64 bg-gradient-to-r from-blue-500 to-teal-400 animate-fade-in">
@@ -117,21 +154,19 @@ export default function ProfilePage() {
         {/* Profile Header */}
         <div className="bg-white shadow-lg rounded-2xl p-8 mb-8 glassmorphism animate-blur-in">
           <div className="flex flex-col md:flex-row items-center gap-8">
-            {/* Profile Picture Section */}
             <div className="relative group flex justify-center">
               <div className="h-32 w-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                {/* Imaginea de profil */}
+                {/* Uncomment if profilePic is supported */}
                 {/* <Image
-              src={user?.profilePic || ""}
-              alt={user?.username || "Profile Picture"}
-              width={128}
-              height={128}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-            /> */}
+                  src={user?.profilePic || ""}
+                  alt={user?.username || "Profile Picture"}
+                  width={128}
+                  height={128}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                /> */}
               </div>
             </div>
 
-            {/* Profile Info Section */}
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row items-center md:justify-between gap-4 mb-4">
                 <div>
@@ -145,7 +180,7 @@ export default function ProfilePage() {
                     type="button"
                     title="Edit Profile"
                     variant="btn_white_text"
-                    onClick={() => setIsEditing(!isEditing)} // Toggle edit mode
+                    onClick={() => setIsEditing(!isEditing)}
                   />
                   <Button
                     type="button"
@@ -159,7 +194,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Edit Form - If editing */}
+        {/* Edit Form */}
         {isEditing && (
           <form
             onSubmit={handleSubmit}
@@ -210,9 +245,8 @@ export default function ProfilePage() {
           </form>
         )}
 
-        {/* Profile Content */}
+        {/* About & Specialties */}
         <div className="flex gap-8 flex-wrap lg:flex-nowrap">
-          {/* About Section */}
           <div className="w-full lg:w-1/2">
             <div className="bg-white shadow-lg rounded-2xl p-6">
               <h2 className="text-xl font-bold mb-4">About</h2>
@@ -222,7 +256,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Cooking Specialties Section */}
           <div className="w-full lg:w-1/2">
             <div className="bg-white shadow-lg rounded-2xl p-6">
               <h2 className="text-xl font-bold mb-4">Cooking Specialties</h2>
@@ -240,14 +273,41 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Recipes Section */}
+        <div className="mt-10">
+          <div className="bg-white shadow-lg rounded-2xl p-6">
+            <h2 className="text-xl font-bold mb-4">Your Recipes</h2>
+            {loadingRecipes ? (
+              <p>Loading recipes...</p>
+            ) : recipes.length === 0 ? (
+              <p className="text-gray-600">No recipes found.</p>
+            ) : (
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {recipes.map((recipe) => (
+                  <li
+                    key={recipe._id}
+                    className="bg-gray-50 border border-gray-200 p-4 rounded-xl shadow-sm hover:shadow-md transition"
+                  >
+                    <h3 className="text-lg font-semibold mb-1">
+                      {recipe.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 line-clamp-3">
+                      {recipe.description}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
         <div className="flex justify-end">
           <Button
             type="button"
             loading={isLoading}
             title="Logout"
             variant="btn_red"
-            // icon="/log-out.svg"
-            className=" mt-8"
+            className="mt-8"
             onClick={logout}
           />
         </div>
