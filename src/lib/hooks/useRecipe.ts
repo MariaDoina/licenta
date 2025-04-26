@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApi } from "@/lib/hooks/ApiRequests";
 
-interface Recipe {
+export interface Recipe {
   _id: string;
   title: string;
   imageUrl?: string;

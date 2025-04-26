@@ -55,6 +55,14 @@ const userSchema = new mongoose.Schema({
       message: "You can specify up to 10 specialties.",
     },
   },
+
+  recipes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "recipes",
+    },
+  ],
+
   createdAt: {
     type: Date,
     default: Date.now,

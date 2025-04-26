@@ -2,6 +2,7 @@ import { connect } from "@/db/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/userModel";
 import { getDataFromToken } from "@/lib/helpers/getDataFromToken";
+import cloudinary from "@/lib/cloudinary";
 
 connect();
 

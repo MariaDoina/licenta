@@ -10,7 +10,7 @@ export const getDataFromToken = (request: NextRequest) => {
     ) as JwtPayload;
 
     if (!decodedToken.id) {
-      throw new Error("Token does not contain valid user idc");
+      throw new Error("Token does not contain valid user id");
     }
 
     return decodedToken.id;

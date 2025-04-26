@@ -1,28 +1,38 @@
-import { NextRequest, NextResponse } from "next/server";
 import { connect } from "@/db/dbConfig";
-import Recipe from "@/models/recipeModel";
+import { NextRequest, NextResponse } from "next/server";
+import User from "@/models/userModel";
 
-export async function GET(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
-  await connect();
+connect();
 
-  const { id } = context.params;
-
+export async function POST(request: NextRequest) {
   try {
-    const recipe = await Recipe.findById(id);
+    const reqBody = await request.json();
+    const { token } = reqBody;
+    // console.log(token);
 
-    if (!recipe) {
-      return NextResponse.json({ error: "Recipe not found" }, { status: 404 });
+    const user = await User.findOne({
+      verifyToken: token,
+      verifyTokenExpiry: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Token is invalid or has expired" },
+        { status: 400 }
+      );
     }
+    console.log("User luat din verifyEmail API", user);
 
-    return NextResponse.json(recipe, { status: 200 });
-  } catch (err) {
-    console.error("Error fetching recipe:", err);
-    return NextResponse.json(
-      { error: "Something went wrong" },
-      { status: 500 }
-    );
+    user.isVerified = true;
+    user.verifyToken = undefined;
+    user.verifyTokenExpiry = undefined;
+    await user.save();
+
+    return NextResponse.json({
+      message: "Email verified successfully",
+      success: true,
+    });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

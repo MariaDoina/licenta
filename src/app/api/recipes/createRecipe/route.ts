@@ -1,5 +1,6 @@
 import { connect } from "@/db/dbConfig";
 import Recipe from "@/models/recipeModel";
+import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/helpers/verifyToken";
 
@@ -76,10 +77,16 @@ export async function POST(request: NextRequest) {
 
     const savedRecipe = await newRecipe.save();
     console.log("Recipe saved:", savedRecipe);
-    console.log("Recipe that was saved: ", savedRecipe);
+
+    //Add the recipe to the user
+    await User.findByIdAndUpdate(id, {
+      $push: { recipes: savedRecipe._id },
+    });
+
+    console.log(`Recipe ID ${savedRecipe._id} added to user ${id}`);
 
     return NextResponse.json({
-      message: "Recipe created successfully",
+      message: "Recipe created and linked to user successfully",
       success: true,
       savedRecipe,
     });

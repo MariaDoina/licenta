@@ -1,119 +1,50 @@
 "use client";
-import axios from "axios";
-import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Button from "@/components/Button";
-import Image from "next/image";
+import toast from "react-hot-toast";
+import { useApi } from "@/lib/hooks/ApiRequests";
 import { useLoadingState } from "@/lib/hooks/useLoadingState";
+import Button from "@/components/Button";
+import RecipeList, { Recipe } from "@/components/RecipeUI/RecipeList";
 
 type UserData = {
   _id: string;
   username: string;
   email: string;
-  profilePic: string;
   about: string;
   specialties: string[];
+  recipes: Recipe[];
 };
 
-type Recipe = {
-  _id: string;
-  title: string;
-  description?: string;
-  userOwner:
-    | string
-    | {
-        _id: string;
-        username: string;
-        email?: string;
-      };
-};
 export default function ProfilePage() {
+  const { logout, getUserDetails, updateProfile } = useApi();
   const router = useRouter();
+
   const [user, setUser] = useState<UserData | null>(null);
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [loadingRecipes, setLoadingRecipes] = useState(false);
-
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    about: "",
-    specialties: "",
-  });
-
+  const [formData, setFormData] = useState({ about: "", specialties: "" });
   const { isLoading, startLoading, stopLoading } = useLoadingState();
 
-  const logout = async () => {
+  const fetchUserDetails = async () => {
     try {
-      startLoading();
-      await axios.get("/api/users/logout");
-      toast.success("Logged out successfully");
-      router.push("/");
-    } catch (error: any) {
-      console.log(error.message);
-      toast.error("Failed to logout");
-    } finally {
-      stopLoading();
-    }
-  };
-
-  const getUserDetails = async () => {
-    try {
-      const res = await axios.get("/api/users/myUser");
-      setUser(res.data.data);
+      const userData = await getUserDetails();
+      setUser(userData);
       setFormData({
-        about: res.data.data.about || "",
-        specialties: res.data.data.specialties.join(", ") || "",
+        about: userData.about || "",
+        specialties: userData.specialties.join(", ") || "",
       });
-    } catch (error: any) {
-      console.log(error.message);
-      toast.error("Failed to get user details");
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  const getUserRecipes = async () => {
-    try {
-      setLoadingRecipes(true);
-      if (!user?._id) return;
-      const res = await axios.get("/api/recipes/getUserRecipe");
-      const userRecipes = res.data.recipes.filter(
-        (recipe: Recipe) => recipe.userOwner === user._id
-      );
-      setRecipes(res.data.recipes || []);
-    } catch (error: any) {
-      console.log(error.message);
-      toast.error("Failed to fetch recipes");
-    } finally {
-      setLoadingRecipes(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (formData.about.length > 500) {
-      return toast.error("About section cannot exceed 500 characters.");
-    }
-
-    const specialtiesArray = formData.specialties
-      .split(",")
-      .map((s) => s.trim());
-    if (specialtiesArray.length > 10) {
-      return toast.error("You can specify up to 10 specialties.");
-    }
-
+  const handleLogout = async () => {
     try {
       startLoading();
-      const updatedUser = {
-        about: formData.about,
-        specialties: specialtiesArray,
-      };
-      await axios.put("/api/users/updateProfile", updatedUser);
-      toast.success("Profile updated successfully");
-      setIsEditing(false);
-      getUserDetails();
-    } catch (error: any) {
-      console.log(error.message);
-      toast.error("Failed to update profile");
+      await logout();
+      router.push("/");
+    } catch (error) {
+      console.error(error);
     } finally {
       stopLoading();
     }
@@ -122,21 +53,41 @@ export default function ProfilePage() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.about.length > 500) {
+      return toast.error("About section cannot exceed 500 characters.");
+    }
+    const specialtiesArray = formData.specialties
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+
+    if (specialtiesArray.length > 10) {
+      return toast.error("You can specify up to 10 specialties.");
+    }
+
+    try {
+      startLoading();
+      await updateProfile({
+        about: formData.about,
+        specialties: specialtiesArray,
+      });
+      setIsEditing(false);
+      fetchUserDetails();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      stopLoading();
+    }
   };
 
   useEffect(() => {
-    getUserDetails();
+    fetchUserDetails();
   }, []);
-
-  useEffect(() => {
-    if (user?._id) {
-      getUserRecipes();
-    }
-  }, [user]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-4">
@@ -151,31 +102,17 @@ export default function ProfilePage() {
       </div>
 
       <div className="container mx-auto relative z-10 -mt-24 pb-20">
-        {/* Profile Header */}
         <div className="bg-white shadow-lg rounded-2xl p-8 mb-8 glassmorphism animate-blur-in">
           <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="relative group flex justify-center">
-              <div className="h-32 w-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                {/* Uncomment if profilePic is supported */}
-                {/* <Image
-                  src={user?.profilePic || ""}
-                  alt={user?.username || "Profile Picture"}
-                  width={128}
-                  height={128}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                /> */}
-              </div>
-            </div>
+            <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-200"></div>
 
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row items-center md:justify-between gap-4 mb-4">
                 <div>
-                  <h1 className="text-3xl font-bold mb-1">{user?.username}</h1>
-                  <p className="text-gray-500 flex items-center gap-2">
-                    <span className="text-sm">{user?.email}</span>
-                  </p>
+                  <h1 className="text-3xl font-bold">{user?.username}</h1>
+                  <p className="text-gray-500">{user?.email}</p>
                 </div>
-                <div className="flex flex-col gap-4 mt-2">
+                <div className="flex flex-col gap-2">
                   <Button
                     type="button"
                     title="Edit Profile"
@@ -194,7 +131,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Edit Form */}
         {isEditing && (
           <form
             onSubmit={handleSubmit}
@@ -202,7 +138,7 @@ export default function ProfilePage() {
           >
             <div className="mb-4">
               <label
-                className="block text-sm font-semibold text-gray-700 mb-2"
+                className="block text-sm font-semibold mb-2"
                 htmlFor="about"
               >
                 About
@@ -213,17 +149,15 @@ export default function ProfilePage() {
                 value={formData.about}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm"
-                placeholder="Tell us about yourself..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-md"
               />
             </div>
-
             <div className="mb-4">
               <label
-                className="block text-sm font-semibold text-gray-700 mb-2"
+                className="block text-sm font-semibold mb-2"
                 htmlFor="specialties"
               >
-                Cooking Specialties (comma separated)
+                Cooking Specialties
               </label>
               <input
                 type="text"
@@ -231,11 +165,9 @@ export default function ProfilePage() {
                 name="specialties"
                 value={formData.specialties}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm"
-                placeholder="e.g. Italian, Vegetarian, Baking"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md"
               />
             </div>
-
             <Button
               loading={isLoading}
               title="Save Changes"
@@ -245,27 +177,26 @@ export default function ProfilePage() {
           </form>
         )}
 
-        {/* About & Specialties */}
-        <div className="flex gap-8 flex-wrap lg:flex-nowrap">
+        <div className="flex gap-8 flex-wrap lg:flex-nowrap mb-10">
           <div className="w-full lg:w-1/2">
             <div className="bg-white shadow-lg rounded-2xl p-6">
               <h2 className="text-xl font-bold mb-4">About</h2>
               <p className="text-gray-700">
-                {user?.about || "No description available"}
+                {user?.about || "No description available."}
               </p>
             </div>
           </div>
 
           <div className="w-full lg:w-1/2">
             <div className="bg-white shadow-lg rounded-2xl p-6">
-              <h2 className="text-xl font-bold mb-4">Cooking Specialties</h2>
+              <h2 className="text-xl font-bold mb-4">Specialties</h2>
               <div className="flex flex-wrap gap-2">
-                {user?.specialties?.map((skill, idx) => (
+                {user?.specialties?.map((specialty, index) => (
                   <span
-                    key={idx}
-                    className="bg-white px-3 py-1.5 rounded-lg text-sm border border-gray-200 shadow-sm"
+                    key={index}
+                    className="bg-gray-100 px-3 py-1 rounded-full text-sm"
                   >
-                    {skill}
+                    {specialty}
                   </span>
                 ))}
               </div>
@@ -273,42 +204,32 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Recipes Section */}
-        <div className="mt-10">
-          <div className="bg-white shadow-lg rounded-2xl p-6">
-            <h2 className="text-xl font-bold mb-4">Your Recipes</h2>
-            {loadingRecipes ? (
-              <p>Loading recipes...</p>
-            ) : recipes.length === 0 ? (
-              <p className="text-gray-600">No recipes found.</p>
-            ) : (
-              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {recipes.map((recipe) => (
-                  <li
-                    key={recipe._id}
-                    className="bg-gray-50 border border-gray-200 p-4 rounded-xl shadow-sm hover:shadow-md transition"
-                  >
-                    <h3 className="text-lg font-semibold mb-1">
-                      {recipe.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 line-clamp-3">
-                      {recipe.description}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            )}
+        {/* Show Users recipes */}
+        <div className="bg-white shadow-lg rounded-2xl p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">Your Recipes</h2>
+            <Button
+              type="button"
+              title="Add New Recipe"
+              variant="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+              onClick={() => router.push("/create_recipe/manual")}
+            />
           </div>
+
+          {user?.recipes?.length === 0 ? (
+            <p className="text-center text-gray-500">No recipes found.</p>
+          ) : (
+            <RecipeList recipes={user?.recipes || []} />
+          )}
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end mt-8">
           <Button
             type="button"
             loading={isLoading}
             title="Logout"
             variant="btn_red"
-            className="mt-8"
-            onClick={logout}
+            onClick={handleLogout}
           />
         </div>
       </div>

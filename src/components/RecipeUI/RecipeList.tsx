@@ -16,7 +16,9 @@ interface Props {
 const RecipeList = ({ recipes }: Props) => {
   if (recipes.length === 0) {
     return (
-      <p className="text-center text-gray-500">No recipes available yet.</p>
+      <p className="text-center text-gray-500 mb-10">
+        No recipes available yet.
+      </p>
     );
   }
 
@@ -56,7 +58,7 @@ const RecipeList = ({ recipes }: Props) => {
                 <div className="flex flex-wrap justify-center gap-2 mt-2">
                   {recipe.tags.map((tag, index) => (
                     <span
-                      key={index}
+                      key={tag}
                       className="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded-full"
                     >
                       {tag}

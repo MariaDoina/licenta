@@ -101,6 +101,45 @@ export const useApi = () => {
     }
   };
 
+  //Api request for user logout, getting user data, updating user data, and getting user recipes
+
+  const logout = async () => {
+    try {
+      await axios.get("/api/users/logout");
+      toast.success("Logged out successfully");
+    } catch (error: any) {
+      console.log(error.message);
+      toast.error("Failed to logout");
+      throw error;
+    }
+  };
+
+  const getUserDetails = async () => {
+    try {
+      const res = await axios.get("/api/users/myUser");
+      console.log("User details response:", res.data);
+      return res.data.data;
+    } catch (error: any) {
+      console.error("Error getting user details:", error);
+      toast.error("Failed to get user details");
+      throw error;
+    }
+  };
+
+  const updateProfile = async (userUpdate: {
+    about: string;
+    specialties: string[];
+  }) => {
+    try {
+      const res = await axios.put("/api/users/updateProfile", userUpdate);
+      toast.success("Profile updated successfully");
+      return res.data;
+    } catch (error: any) {
+      toast.error("Failed to update profile");
+      throw error;
+    }
+  };
+
   return {
     signup,
     login,
@@ -110,5 +149,8 @@ export const useApi = () => {
     checkAuth,
     getRecipes,
     getRecipeById,
+    logout,
+    getUserDetails,
+    updateProfile,
   };
 };

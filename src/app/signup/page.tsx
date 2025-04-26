@@ -36,10 +36,10 @@ export default function SignupPage() {
       return false;
     }
 
-    if (user.password.length < 8) {
-      toast.error("Password must be at least 8 characters long!");
-      return false;
-    }
+    // if (user.password.length < 8) {
+    //   toast.error("Password must be at least 8 characters long!");
+    //   return false;
+    // }
 
     return true;
   };
