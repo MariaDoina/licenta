@@ -11,10 +11,10 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     console.log("Body received:", body);
 
-    const { username, about, specialties } = body;
+    const { username, about, specialties, profileImage } = body;
 
     // Validate input
-    if (!username && !about && !specialties) {
+    if (!username && !about && !specialties && !profileImage) {
       return NextResponse.json(
         { error: "Please provide data to update." },
         { status: 400 }
@@ -37,12 +37,14 @@ export async function PUT(request: NextRequest) {
     if (username) updateData.username = username;
     if (about) updateData.about = about;
     if (specialties) updateData.specialties = specialties;
+    if (profileImage) updateData.profileImageUrl = profileImage;
 
     // Update user
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
       new: true,
       runValidators: true,
     });
+    console.log("Updated user:", updatedUser);
 
     if (!updatedUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });

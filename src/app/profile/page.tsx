@@ -1,13 +1,12 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-import { useApi } from "@/lib/hooks/ApiRequests";
-import { useLoadingState } from "@/lib/hooks/useLoadingState";
-import Button from "@/components/Button";
 import RecipeList, { Recipe } from "@/components/RecipeUI/RecipeList";
 import ProfileEditForm from "@/components/forms/ProfileEditForm";
+import { useLoadingState } from "@/lib/hooks/useLoadingState";
+import { useApi } from "@/lib/hooks/ApiRequests";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Button from "@/components/Button";
+import toast from "react-hot-toast";
 
 type UserData = {
   _id: string;
@@ -16,7 +15,7 @@ type UserData = {
   about: string;
   specialties: string[];
   recipes: Recipe[];
-  profileImage: string | null;
+  profileImageUrl: string | null; // Folosim profileImageUrl în loc de profileImage
 };
 
 export default function ProfilePage() {
@@ -56,7 +55,7 @@ export default function ProfilePage() {
     profileImage: File | null;
   }) => {
     try {
-      let profileImageUrl = user?.profileImage || null;
+      let profileImageUrl = user?.profileImageUrl || null; // Folosim profileImageUrl aici
 
       if (updatedData.profileImage) {
         const uploadedImageUrl = await uploadProfileImage(
@@ -69,7 +68,7 @@ export default function ProfilePage() {
         username: updatedData.username,
         about: updatedData.about,
         specialties: updatedData.specialties,
-        profileImage: profileImageUrl,
+        profileImageUrl, // Actualizam cu profileImageUrl
       };
 
       await updateProfile(updateData);
@@ -85,6 +84,10 @@ export default function ProfilePage() {
   useEffect(() => {
     fetchUserDetails();
   }, []);
+
+  if (user) {
+    console.log("ProfileImageUrl in Render:", user.profileImageUrl); // Verificăm corectitudinea datelor
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-4">
@@ -102,9 +105,9 @@ export default function ProfilePage() {
         <div className="bg-white shadow-lg rounded-2xl p-8 mb-8 glassmorphism animate-blur-in">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-200">
-              {user?.profileImage ? (
+              {user?.profileImageUrl ? ( // Folosim profileImageUrl
                 <img
-                  src={user.profileImage}
+                  src={user.profileImageUrl}
                   alt="Profile Image"
                   className="w-full h-full object-cover"
                 />
@@ -145,7 +148,7 @@ export default function ProfilePage() {
             currentUsername={user.username}
             currentAbout={user.about}
             currentSpecialties={user.specialties}
-            currentProfileImage={user.profileImage}
+            currentProfileImage={user.profileImageUrl} // Actualizăm cu profileImageUrl
             onSave={handleSaveChanges}
           />
         )}

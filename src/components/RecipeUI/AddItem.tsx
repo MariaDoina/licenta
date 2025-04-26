@@ -32,20 +32,21 @@ const AddItem: React.FC<AddItemProps> = ({
           type="text"
           value={newItem}
           onChange={(e) => setNewItem(e.target.value)}
-          placeholder={`Enter a ${label.toLowerCase()}`}
+          placeholder={`Enter one ${label.toLowerCase()}`}
           className="w-full p-3 pl-5 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
         />
         <Button
           type="button"
           icon="/plus.svg"
-          title="Add"
+          title={`Add ${label}`}
           variant="btn_small_gradient sm: pr-10"
           onClick={handleAdd}
         />
       </div>
+
       {/* Display Added Items */}
       {itemList.length > 0 && (
-        <div className="mb-4 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
           {itemList.map((item, index) => (
             <div
               key={index}

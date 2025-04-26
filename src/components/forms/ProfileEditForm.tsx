@@ -69,19 +69,8 @@ const ProfileEditForm = ({
       return;
     }
 
-    const formDataToSend = new FormData();
-    formDataToSend.append("username", formData.username);
-    formDataToSend.append("about", formData.about);
-    formDataToSend.append("specialties", JSON.stringify(specialtiesArray));
-
-    if (formData.profileImage) {
-      formDataToSend.append("profileImage", formData.profileImage);
-    }
-
     try {
       startLoading();
-      await updateProfile(formDataToSend);
-      toast.success("Profile updated successfully!");
 
       onSave({
         username: formData.username,

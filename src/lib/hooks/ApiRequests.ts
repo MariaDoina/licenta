@@ -130,7 +130,7 @@ export const useApi = () => {
     username: string;
     about: string;
     specialties: string[];
-    profileImage: string | null;
+    profileImageUrl: string | null;
   }) => {
     try {
       const res = await axios.put("/api/users/updateProfile", data, {

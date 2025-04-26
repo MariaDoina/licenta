@@ -8,7 +8,6 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const image = formData.get("profileImage") as File;
-
     if (!image) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
     }
