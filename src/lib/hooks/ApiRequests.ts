@@ -126,16 +126,42 @@ export const useApi = () => {
     }
   };
 
-  const updateProfile = async (userUpdate: {
+  const updateProfile = async (data: {
+    username: string;
     about: string;
     specialties: string[];
+    profileImage: string | null;
   }) => {
     try {
-      const res = await axios.put("/api/users/updateProfile", userUpdate);
+      const res = await axios.put("/api/users/updateProfile", data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       toast.success("Profile updated successfully");
       return res.data;
     } catch (error: any) {
       toast.error("Failed to update profile");
+      throw error;
+    }
+  };
+
+  const uploadProfileImage = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append("profileImage", file);
+
+      const res = await axios.post("/api/users/uploadProfileImage", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      toast.success("Profile image uploaded successfully!");
+      return res.data.imageUrl;
+    } catch (error: any) {
+      console.error("Error uploading profile image:", error);
+      toast.error("Failed to upload profile image");
       throw error;
     }
   };
@@ -152,5 +178,6 @@ export const useApi = () => {
     logout,
     getUserDetails,
     updateProfile,
+    uploadProfileImage,
   };
 };

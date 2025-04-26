@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -6,6 +7,7 @@ import { useApi } from "@/lib/hooks/ApiRequests";
 import { useLoadingState } from "@/lib/hooks/useLoadingState";
 import Button from "@/components/Button";
 import RecipeList, { Recipe } from "@/components/RecipeUI/RecipeList";
+import ProfileEditForm from "@/components/forms/ProfileEditForm";
 
 type UserData = {
   _id: string;
@@ -14,25 +16,22 @@ type UserData = {
   about: string;
   specialties: string[];
   recipes: Recipe[];
+  profileImage: string | null;
 };
 
 export default function ProfilePage() {
-  const { logout, getUserDetails, updateProfile } = useApi();
+  const { logout, getUserDetails, updateProfile, uploadProfileImage } =
+    useApi();
   const router = useRouter();
 
   const [user, setUser] = useState<UserData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({ about: "", specialties: "" });
   const { isLoading, startLoading, stopLoading } = useLoadingState();
 
   const fetchUserDetails = async () => {
     try {
       const userData = await getUserDetails();
       setUser(userData);
-      setFormData({
-        about: userData.about || "",
-        specialties: userData.specialties.join(", ") || "",
-      });
     } catch (error) {
       console.error(error);
     }
@@ -50,38 +49,36 @@ export default function ProfilePage() {
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.about.length > 500) {
-      return toast.error("About section cannot exceed 500 characters.");
-    }
-    const specialtiesArray = formData.specialties
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-
-    if (specialtiesArray.length > 10) {
-      return toast.error("You can specify up to 10 specialties.");
-    }
-
+  const handleSaveChanges = async (updatedData: {
+    username: string;
+    about: string;
+    specialties: string[];
+    profileImage: File | null;
+  }) => {
     try {
-      startLoading();
-      await updateProfile({
-        about: formData.about,
-        specialties: specialtiesArray,
-      });
-      setIsEditing(false);
+      let profileImageUrl = user?.profileImage || null;
+
+      if (updatedData.profileImage) {
+        const uploadedImageUrl = await uploadProfileImage(
+          updatedData.profileImage
+        );
+        profileImageUrl = uploadedImageUrl;
+      }
+
+      const updateData = {
+        username: updatedData.username,
+        about: updatedData.about,
+        specialties: updatedData.specialties,
+        profileImage: profileImageUrl,
+      };
+
+      await updateProfile(updateData);
+      toast.success("Profile updated successfully!");
       fetchUserDetails();
+      setIsEditing(false);
     } catch (error) {
-      console.error(error);
-    } finally {
-      stopLoading();
+      console.error("Failed to save profile changes:", error);
+      toast.error("Failed to save changes.");
     }
   };
 
@@ -104,7 +101,19 @@ export default function ProfilePage() {
       <div className="container mx-auto relative z-10 -mt-24 pb-20">
         <div className="bg-white shadow-lg rounded-2xl p-8 mb-8 glassmorphism animate-blur-in">
           <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-200"></div>
+            <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-200">
+              {user?.profileImage ? (
+                <img
+                  src={user.profileImage}
+                  alt="Profile Image"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-500">
+                  No image
+                </div>
+              )}
+            </div>
 
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row items-center md:justify-between gap-4 mb-4">
@@ -131,50 +140,14 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {isEditing && (
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white shadow-lg rounded-2xl p-6 mb-8"
-          >
-            <div className="mb-4">
-              <label
-                className="block text-sm font-semibold mb-2"
-                htmlFor="about"
-              >
-                About
-              </label>
-              <textarea
-                id="about"
-                name="about"
-                value={formData.about}
-                onChange={handleChange}
-                rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md"
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                className="block text-sm font-semibold mb-2"
-                htmlFor="specialties"
-              >
-                Cooking Specialties
-              </label>
-              <input
-                type="text"
-                id="specialties"
-                name="specialties"
-                value={formData.specialties}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md"
-              />
-            </div>
-            <Button
-              loading={isLoading}
-              title="Save Changes"
-              variant="bg-blue-500 text-white py-2 px-4 mt-4"
-              type="submit"
-            />
-          </form>
+        {isEditing && user && (
+          <ProfileEditForm
+            currentUsername={user.username}
+            currentAbout={user.about}
+            currentSpecialties={user.specialties}
+            currentProfileImage={user.profileImage}
+            onSave={handleSaveChanges}
+          />
         )}
 
         <div className="flex gap-8 flex-wrap lg:flex-nowrap mb-10">
@@ -204,7 +177,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Show Users recipes */}
         <div className="bg-white shadow-lg rounded-2xl p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">Your Recipes</h2>

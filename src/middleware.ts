@@ -5,10 +5,9 @@ export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // Route lists
-  const isPublicPath =
-    path === "/login" || path === "/signup" || path === "/verifyemail";
+  const isPublicPath = path === "/login" || path === "/signup";
 
-  // Verificăm dacă există un token în cookie
+  // Check if the user is logged in by checking the token in cookies
   const token = request.cookies.get("token")?.value || "";
 
   // If user is logged and he tries to access public paths redirect him to the profile page
