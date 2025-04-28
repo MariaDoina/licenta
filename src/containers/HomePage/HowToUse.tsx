@@ -41,6 +41,7 @@ const HowToUse = () => {
           variants={listVariants}
         >
           {[
+            "✔ Create Your Account – Join for free to explore all SmartBite recipes, special features, and more!",
             "✔ Input Your Ingredients – Enter what you have on hand or write your own recipe from scratch.",
             "✔ Generate a Recipe – Watch as our AI crafts a detailed, step-by-step recipe tailored to your ingredients, or take full control and write your own.",
             "✔ Visualize Your Dish – Get a mouth-watering, AI-generated image to see what’s cooking before you even start.",

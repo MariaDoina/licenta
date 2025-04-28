@@ -1,46 +1,59 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useApi } from "@/lib/hooks/ApiRequests";
+
+import { useState, useEffect } from "react";
+import { useApi } from "@/lib/helpers/ApiRequests";
 import { motion } from "framer-motion";
 import RecipeCard from "@/components/RecipeUI/CreateRecipeCard";
 import RecipeList, { Recipe } from "@/components/RecipeUI/RecipeList";
+import useSearch from "@/lib/hooks/useSearch";
 
 const CreateRecipe = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const {
+    title,
+    setTitle,
+    ingredients,
+    setIngredients,
+    tags,
+    setTags,
+    debouncedTitle,
+    debouncedIngredients,
+    debouncedTags,
+  } = useSearch(500);
 
   const { getRecipes } = useApi();
 
   useEffect(() => {
-    setLoading(true);
-    getRecipes()
-      .then((data) => {
-        setRecipes(data);
-      })
-      .catch((err) => {
+    const fetchRecipes = async () => {
+      setLoading(true);
+      try {
+        const filters = debouncedTitle || debouncedIngredients || debouncedTags;
+
+        const response = await getRecipes({
+          ingredients: debouncedIngredients,
+          tags: debouncedTags,
+          title: debouncedTitle,
+        });
+        setRecipes(response.recipes);
+      } catch (err: any) {
         setError(err.message || "Failed to fetch recipes.");
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
-  }, []);
+      }
+    };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-100 to-blue-100">
-        <p className="text-lg text-gray-600">Loading...</p>
-      </div>
-    );
-  }
+    fetchRecipes();
+  }, [debouncedTitle, debouncedIngredients, debouncedTags]);
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-lg text-red-600">{error}</div>
-      </div>
-    );
-  }
+  const handleSearchChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    setter(e.target.value);
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-green-100 to-blue-100 px-4 py-16">
@@ -65,10 +78,62 @@ const CreateRecipe = () => {
         and organize your own favorite recipes.
       </motion.p>
 
+      {/* Filters Section */}
+      <div className="mb-12 w-full max-w-3xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+          {/* Search by Title */}
+          <div className="flex flex-col">
+            <label className="mb-2 text-sm font-semibold text-gray-700">
+              Title
+            </label>
+            <input
+              type="text"
+              className="p-3 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="e.g., Chocolate Cake"
+              value={title}
+              onChange={(e) => handleSearchChange(e, setTitle)}
+            />
+          </div>
+
+          {/* Search by Ingredients */}
+          <div className="flex flex-col">
+            <label className="mb-2 text-sm font-semibold text-gray-700">
+              Ingredients (comma separated)
+            </label>
+            <input
+              type="text"
+              className="p-3 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+              placeholder="e.g., sugar, flour, butter"
+              value={ingredients}
+              onChange={(e) => handleSearchChange(e, setIngredients)}
+            />
+          </div>
+
+          {/* Search by Tags */}
+          <div className="flex flex-col">
+            <label className="mb-2 text-sm font-semibold text-gray-700">
+              Tags (comma separated)
+            </label>
+            <input
+              type="text"
+              className="p-3 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+              placeholder="e.g., dessert, quick, vegan"
+              value={tags}
+              onChange={(e) => handleSearchChange(e, setTags)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Loading state small message */}
+      {loading && (
+        <div className="text-gray-500 mb-4">Searching recipes...</div>
+      )}
+
       {/* Show Recipes */}
       <RecipeList recipes={recipes} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-4xl px-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-4xl px-4 mt-12">
         <RecipeCard
           href="/create_recipe/ai"
           imageSrc="/wand.svg"
@@ -85,6 +150,9 @@ const CreateRecipe = () => {
           description="Prefer the classic way? Add your ingredients and instructions step by step."
         />
       </div>
+
+      {/* Error Message */}
+      {error && <div className="text-lg text-red-600 mt-8">{error}</div>}
     </div>
   );
 };

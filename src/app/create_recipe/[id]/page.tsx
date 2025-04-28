@@ -1,4 +1,5 @@
 "use client";
+
 import { useParams, useRouter } from "next/navigation";
 import useRecipe from "@/lib/hooks/useRecipe";
 import Button from "@/components/Button";
@@ -8,6 +9,14 @@ const RecipeDetailPage = () => {
   const { id } = useParams();
   const router = useRouter();
   const { recipe, loading, error } = useRecipe(id as string);
+
+  const token =
+    typeof window !== "undefined"
+      ? document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("token="))
+          ?.split("=")[1]
+      : null;
 
   if (loading)
     return (
@@ -34,8 +43,8 @@ const RecipeDetailPage = () => {
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-br from-green-100 to-blue-100">
-      {/* Back Button */}
-      <div className="max-w-4xl mx-auto mb-6">
+      {/* Top navigation buttons */}
+      <div className="max-w-4xl mx-auto flex justify-between items-center mb-6">
         <Button
           type="button"
           title="Back to Recipes"
@@ -43,6 +52,15 @@ const RecipeDetailPage = () => {
           variant="btn_white_recipe"
           onClick={() => router.push("/create_recipe")}
         />
+
+        {/* {isOwner && (
+          <Button
+            type="button"
+            title="Edit Recipe"
+            variant="btn_white_text"
+            onClick={() => router.push(`/edit_recipe/${id}`)}
+          />
+        )} */}
       </div>
 
       {/* Recipe Card */}
@@ -67,7 +85,7 @@ const RecipeDetailPage = () => {
         )}
 
         <div className="p-6 bg-white">
-          {/* Time, author, data */}
+          {/* Time, Author, Date */}
           <div className="flex flex-col items-start gap-4 mb-8">
             <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
               {cookingTime && (
@@ -82,26 +100,17 @@ const RecipeDetailPage = () => {
                 </div>
               )}
               <div className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-                <span role="img" aria-label="chef">
-                  <Image
-                    src="/chef.svg"
-                    alt="Chef icon"
-                    width={20}
-                    height={20}
-                  />
-                </span>
+                <Image src="/chef.svg" alt="Chef icon" width={20} height={20} />
                 <span>By {userOwner?.username || "Unknown chef"}</span>
               </div>
               {createdAt && (
                 <div className="flex items-center gap-2 bg-gray-100 text-gray-800 px-3 py-1 rounded-full">
-                  <span role="img" aria-label="calendar">
-                    <Image
-                      src="/calendar.svg"
-                      alt="Calendar icon"
-                      width={20}
-                      height={20}
-                    />
-                  </span>
+                  <Image
+                    src="/calendar.svg"
+                    alt="Calendar icon"
+                    width={20}
+                    height={20}
+                  />
                   <span>{new Date(createdAt).toLocaleDateString()}</span>
                 </div>
               )}
@@ -138,7 +147,7 @@ const RecipeDetailPage = () => {
           )}
 
           {/* Ingredients and Instructions */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6  w-full mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 w-full mx-auto">
             {/* Ingredients */}
             <div className="md:col-span-2">
               <h2 className="text-2xl font-semibold mb-3">Ingredients</h2>

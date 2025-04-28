@@ -2,7 +2,7 @@
 import IconHeader from "@/components/LoginSignupUI/IconHeader";
 import { useLoadingState } from "@/lib/hooks/useLoadingState";
 import React, { useState, useEffect } from "react";
-import { useApi } from "@/lib/hooks/ApiRequests";
+import { useApi } from "@/lib/helpers/ApiRequests";
 import Form from "@/components/forms/AuthForm";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";

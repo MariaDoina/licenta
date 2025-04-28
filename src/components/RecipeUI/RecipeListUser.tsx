@@ -1,25 +1,19 @@
+import { Recipe } from "@/components/RecipeUI/RecipeList";
+import Button from "@/components/Button";
 import Link from "next/link";
-
-export interface Recipe {
-  _id: string;
-  title: string;
-  imageUrl: string;
-  cookingTime: number;
-  difficulty: "easy" | "medium" | "hard";
-  tags: string[];
-  ingredients: string[];
-  instructions: string;
-}
+import { useRouter } from "next/navigation";
 
 interface Props {
   recipes: Recipe[];
 }
 
-const RecipeList = ({ recipes }: Props) => {
+const RecipeListUser = ({ recipes }: Props) => {
+  const router = useRouter();
+
   if (recipes.length === 0) {
     return (
       <p className="text-center text-gray-500 mb-10 text-lg">
-        No recipes available yet.
+        You have no recipes yet.
       </p>
     );
   }
@@ -27,8 +21,12 @@ const RecipeList = ({ recipes }: Props) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-15">
       {recipes.map((recipe) => (
-        <Link key={recipe._id} href={`/create_recipe/${recipe._id}`}>
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.03] transition-transform duration-300">
+        <div
+          key={recipe._id}
+          className="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.03] transition-transform duration-300"
+        >
+          {/* Wrap the whole card in a Link */}
+          <Link href={`/create_recipe/${recipe._id}`} className="block">
             {recipe.imageUrl ? (
               <img
                 src={recipe.imageUrl}
@@ -73,11 +71,21 @@ const RecipeList = ({ recipes }: Props) => {
                 </div>
               )}
             </div>
+          </Link>
+
+          {/* Edit Button */}
+          <div className="p-4 bg-gray-100 flex justify-center">
+            <Button
+              type="button"
+              title="Edit Recipe"
+              variant="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600"
+              onClick={() => router.push(`/edit_recipe/${recipe._id}`)} // Keep the button functionality separate
+            />
           </div>
-        </Link>
+        </div>
       ))}
     </div>
   );
 };
 
-export default RecipeList;
+export default RecipeListUser;

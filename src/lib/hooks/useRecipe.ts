@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useApi } from "@/lib/hooks/ApiRequests";
+import { useApi } from "@/lib/helpers/ApiRequests";
 
 export interface Recipe {
   _id: string;

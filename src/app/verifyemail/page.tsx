@@ -1,7 +1,7 @@
 "use client";
 import IconHeader from "@/components/LoginSignupUI/IconHeader";
 import React, { useEffect, useState } from "react";
-import { useApi } from "@/lib/hooks/ApiRequests";
+import { useApi } from "@/lib/helpers/ApiRequests";
 import Link from "next/link";
 
 export default function VerifyEmailPage() {

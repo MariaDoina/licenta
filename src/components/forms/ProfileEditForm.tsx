@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import Button from "@/components/Button";
-import { useApi } from "@/lib/hooks/ApiRequests";
+import { useApi } from "@/lib/helpers/ApiRequests";
 import { useLoadingState } from "@/lib/hooks/useLoadingState";
 
 type ProfileEditFormProps = {

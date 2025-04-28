@@ -31,7 +31,16 @@ export async function POST(request: NextRequest) {
       difficulty,
       tags = [],
     } = reqBody;
-    console.log("Request body:", reqBody);
+    // console.log("Request body:", reqBody);
+
+    //Check if recipe already exists
+    const existingRecipe = await Recipe.findOne({ title });
+    if (existingRecipe) {
+      return NextResponse.json(
+        { error: "A recipe with this title already exists." },
+        { status: 400 }
+      );
+    }
 
     // validate image just for recipes created by users
     if (!imageUrl && !isGenerated) {
@@ -65,15 +74,15 @@ export async function POST(request: NextRequest) {
       tags,
     });
 
-    console.log("Saving recipe with image:", {
-      title,
-      ingredients,
-      instructions,
-      cookingTime,
-      imageUrl,
-      difficulty,
-      tags,
-    });
+    // console.log("Saving recipe with image:", {
+    //   title,
+    //   ingredients,
+    //   instructions,
+    //   cookingTime,
+    //   imageUrl,
+    //   difficulty,
+    //   tags,
+    // });
 
     const savedRecipe = await newRecipe.save();
     console.log("Recipe saved:", savedRecipe);
@@ -83,7 +92,7 @@ export async function POST(request: NextRequest) {
       $push: { recipes: savedRecipe._id },
     });
 
-    console.log(`Recipe ID ${savedRecipe._id} added to user ${id}`);
+    // console.log(`Recipe ID ${savedRecipe._id} added to user ${id}`);
 
     return NextResponse.json({
       message: "Recipe created and linked to user successfully",

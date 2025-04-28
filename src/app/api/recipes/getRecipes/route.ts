@@ -1,23 +1,63 @@
 import { connect } from "@/db/dbConfig";
 import Recipe from "@/models/recipeModel";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 connect();
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const recipes = await Recipe.find(
-      {},
-      "title imageUrl cookingTime difficulty tags"
-    ).sort({
-      createdAt: -1,
-    });
+    const { searchParams } = new URL(request.url);
+    const ingredientsParam = searchParams.get("ingredients");
+    const tagsParam = searchParams.get("tags");
+    const titleParam = searchParams.get("title");
 
-    return NextResponse.json(recipes);
+    const query: any = {};
+
+    // Filtering by ingredients
+    if (ingredientsParam) {
+      const ingredientsArray = ingredientsParam
+        .split(",")
+        .map((i) => i.trim().toLowerCase());
+      query.ingredients = {
+        $all: ingredientsArray.map(
+          (ingredient) =>
+            new RegExp(ingredient.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i")
+        ),
+      };
+    }
+
+    // Filtering by tags
+    if (tagsParam) {
+      const tagsArray = tagsParam.split(",").map((t) => t.trim().toLowerCase());
+
+      query.$and = tagsArray.map((tag: string) => ({
+        tags: {
+          $regex: new RegExp(tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"),
+        },
+      }));
+    }
+
+    // Filtering by title
+    if (titleParam) {
+      query.title = {
+        $regex: new RegExp(
+          titleParam.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+          "i"
+        ),
+      };
+    }
+
+    const recipes = await Recipe.find(
+      query,
+      "title imageUrl cookingTime difficulty tags"
+    ).sort({ createdAt: -1 });
+
+    return NextResponse.json({
+      success: true,
+      recipes,
+    });
   } catch (error: any) {
-    return NextResponse.json(
-      { error: "Failed to fetch recipes." },
-      { status: 500 }
-    );
+    console.error("Error searching recipes:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

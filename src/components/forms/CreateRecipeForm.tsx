@@ -1,15 +1,13 @@
 import { useState } from "react";
-import axios from "axios";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import Button from "@/components/Button";
 import AddItem from "@/components/RecipeUI/AddItem";
-
+import { useApi } from "@/lib/helpers/ApiRequests";
 import { useLoadingState } from "@/lib/hooks/useLoadingState";
 
 export default function CreateRecipeForm() {
   const [title, setTitle] = useState("");
-  const [ingredients, setIngredients] = useState("");
   const [ingredientList, setIngredientList] = useState<string[]>([]);
   const [instructions, setInstructions] = useState("");
   const [cookingTime, setCookingTime] = useState("");
@@ -18,8 +16,8 @@ export default function CreateRecipeForm() {
     "easy"
   );
   const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState("");
   const { isLoading, startLoading, stopLoading } = useLoadingState();
+  const { uploadImage, createRecipe } = useApi();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,17 +45,10 @@ export default function CreateRecipeForm() {
 
     try {
       // Send photo to backend
-      const formData = new FormData();
-      formData.append("image", imageFile);
-
-      const imageUploadResponnse = await axios.post(
-        "/api/recipes/uploadImage",
-        formData
-      );
-      const imageUrl = imageUploadResponnse.data.imageUrl;
+      const imageUrl = await uploadImage(imageFile);
 
       // Send rest of the recipe data to backend
-      await axios.post("/api/recipes/createRecipe", {
+      const response = await createRecipe({
         title,
         ingredients: ingredientList,
         instructions,
@@ -67,33 +58,23 @@ export default function CreateRecipeForm() {
         tags,
       });
 
-      toast.success("Recipe created successfully!");
+      if (response.error) {
+        toast.error(response.error);
+        stopLoading();
+        return;
+      }
 
       // Reset form after success
       setTitle("");
-      setIngredients("");
       setIngredientList([]);
       setInstructions("");
       setCookingTime("");
       setImageFile(null);
       setTags([]); // Reset tags
-      setNewTag(""); // Reset new tag input
     } catch (error: any) {
-      toast.error("Error creating recipe. Please try again later.");
     } finally {
       stopLoading();
     }
-  };
-
-  const handleAddIngredient = () => {
-    if (ingredients.trim() !== "") {
-      setIngredientList((prev) => [...prev, ingredients.trim()]);
-      setIngredients("");
-    }
-  };
-
-  const handleRemoveIngredient = (index: number) => {
-    setIngredientList((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,19 +82,6 @@ export default function CreateRecipeForm() {
       const file = e.target.files[0];
       setImageFile(file);
     }
-  };
-
-  const handleAddTag = () => {
-    if (newTag.trim() !== "" && !tags.includes(newTag.trim())) {
-      setTags((prev) => [...prev, newTag.trim()]);
-      setNewTag("");
-    } else {
-      toast.error("Please enter a valid tag or tag already added.");
-    }
-  };
-
-  const handleRemoveTag = (index: number) => {
-    setTags((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -165,10 +133,7 @@ export default function CreateRecipeForm() {
         <AddItem
           label="Ingredient"
           itemList={ingredientList}
-          onAdd={(item) => setIngredientList((prev) => [...prev, item])}
-          onRemove={(index) =>
-            setIngredientList((prev) => prev.filter((_, i) => i !== index))
-          }
+          setItemList={setIngredientList}
         />
 
         {/* Instructions Field */}
@@ -220,15 +185,9 @@ export default function CreateRecipeForm() {
             </button>
           </div>
         </div>
+
         {/* Tags Field */}
-        <AddItem
-          label="Tag"
-          itemList={ingredientList}
-          onAdd={(item) => setIngredientList((prev) => [...prev, item])}
-          onRemove={(index) =>
-            setIngredientList((prev) => prev.filter((_, i) => i !== index))
-          }
-        />
+        <AddItem label="Tag" itemList={tags} setItemList={setTags} />
 
         {/* Insert Image field */}
         <div className="mb-4">
@@ -240,6 +199,7 @@ export default function CreateRecipeForm() {
             onChange={handleImageChange}
           />
         </div>
+
         {/* Submit Button */}
         <Button
           type="submit"

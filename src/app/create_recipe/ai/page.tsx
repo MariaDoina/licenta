@@ -2,7 +2,7 @@
 import Button from "@/components/Button";
 import { motion } from "framer-motion";
 import React, { useState } from "react";
-import IngredientInput from "@/components/IngredientInput";
+import AddItem from "@/components/RecipeUI/AddItem";
 import { useLoadingState } from "@/lib/hooks/useLoadingState";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -65,9 +65,10 @@ export default function GenerateRecipePage() {
           recipe for you to try.
         </motion.p>
 
-        <IngredientInput
-          ingredientList={ingredients}
-          setIngredientList={setIngredients}
+        <AddItem
+          label="Ingredient"
+          itemList={ingredients}
+          setItemList={setIngredients}
         />
 
         <Button

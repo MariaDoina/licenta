@@ -1,5 +1,5 @@
 "use client";
-import { useApi } from "@/lib/hooks/ApiRequests";
+import { useApi } from "@/lib/helpers/ApiRequests";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { NAV_LINKS } from "../constants/HomePageSections";

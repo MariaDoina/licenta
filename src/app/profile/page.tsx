@@ -1,8 +1,9 @@
 "use client";
-import RecipeList, { Recipe } from "@/components/RecipeUI/RecipeList";
+import RecipeListUser from "@/components/RecipeUI/RecipeListUser";
+import { Recipe } from "@/components/RecipeUI/RecipeList";
 import ProfileEditForm from "@/components/forms/ProfileEditForm";
 import { useLoadingState } from "@/lib/hooks/useLoadingState";
-import { useApi } from "@/lib/hooks/ApiRequests";
+import { useApi } from "@/lib/helpers/ApiRequests";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
@@ -15,7 +16,7 @@ type UserData = {
   about: string;
   specialties: string[];
   recipes: Recipe[];
-  profileImageUrl: string | null; // Folosim profileImageUrl în loc de profileImage
+  profileImageUrl: string | null;
 };
 
 export default function ProfilePage() {
@@ -27,6 +28,7 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const { isLoading, startLoading, stopLoading } = useLoadingState();
 
+  // Fetch user details from API
   const fetchUserDetails = async () => {
     try {
       const userData = await getUserDetails();
@@ -36,6 +38,7 @@ export default function ProfilePage() {
     }
   };
 
+  // Handle logout
   const handleLogout = async () => {
     try {
       startLoading();
@@ -48,6 +51,7 @@ export default function ProfilePage() {
     }
   };
 
+  // Save profile changes (username, about, specialties, and profile image)
   const handleSaveChanges = async (updatedData: {
     username: string;
     about: string;
@@ -55,8 +59,9 @@ export default function ProfilePage() {
     profileImage: File | null;
   }) => {
     try {
-      let profileImageUrl = user?.profileImageUrl || null; // Folosim profileImageUrl aici
+      let profileImageUrl = user?.profileImageUrl || null; // Use existing profile image if no new image uploaded
 
+      // If a new image is uploaded, update the profile image URL
       if (updatedData.profileImage) {
         const uploadedImageUrl = await uploadProfileImage(
           updatedData.profileImage
@@ -68,7 +73,7 @@ export default function ProfilePage() {
         username: updatedData.username,
         about: updatedData.about,
         specialties: updatedData.specialties,
-        profileImageUrl, // Actualizam cu profileImageUrl
+        profileImageUrl, // Update with the new or existing profile image URL
       };
 
       await updateProfile(updateData);
@@ -81,16 +86,14 @@ export default function ProfilePage() {
     }
   };
 
+  // Fetch user data when component mounts
   useEffect(() => {
     fetchUserDetails();
   }, []);
 
-  if (user) {
-    console.log("ProfileImageUrl in Render:", user.profileImageUrl); // Verificăm corectitudinea datelor
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-4">
+      {/* Background image section */}
       <div className="relative h-64 bg-gradient-to-r from-blue-500 to-teal-400 animate-fade-in">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-20"
@@ -102,10 +105,12 @@ export default function ProfilePage() {
       </div>
 
       <div className="container mx-auto relative z-10 -mt-24 pb-20">
+        {/* Profile Header */}
         <div className="bg-white shadow-lg rounded-2xl p-8 mb-8 glassmorphism animate-blur-in">
           <div className="flex flex-col md:flex-row items-center gap-8">
+            {/* Profile image */}
             <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-200">
-              {user?.profileImageUrl ? ( // Folosim profileImageUrl
+              {user?.profileImageUrl ? (
                 <img
                   src={user.profileImageUrl}
                   alt="Profile Image"
@@ -118,6 +123,7 @@ export default function ProfilePage() {
               )}
             </div>
 
+            {/* Profile information */}
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row items-center md:justify-between gap-4 mb-4">
                 <div>
@@ -143,16 +149,18 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Profile Edit Form */}
         {isEditing && user && (
           <ProfileEditForm
             currentUsername={user.username}
             currentAbout={user.about}
             currentSpecialties={user.specialties}
-            currentProfileImage={user.profileImageUrl} // Actualizăm cu profileImageUrl
+            currentProfileImage={user.profileImageUrl}
             onSave={handleSaveChanges}
           />
         )}
 
+        {/* About Section */}
         <div className="flex gap-8 flex-wrap lg:flex-nowrap mb-10">
           <div className="w-full lg:w-1/2">
             <div className="bg-white shadow-lg rounded-2xl p-6">
@@ -163,6 +171,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {/* Specialties Section */}
           <div className="w-full lg:w-1/2">
             <div className="bg-white shadow-lg rounded-2xl p-6">
               <h2 className="text-xl font-bold mb-4">Specialties</h2>
@@ -180,24 +189,25 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* User's Recipes */}
         <div className="bg-white shadow-lg rounded-2xl p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">Your Recipes</h2>
-            <Button
-              type="button"
-              title="Add New Recipe"
-              variant="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
-              onClick={() => router.push("/create_recipe/manual")}
-            />
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                title="Add New Recipe"
+                variant="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+                onClick={() => router.push("/create_recipe/manual")}
+              />
+            </div>
           </div>
 
-          {user?.recipes?.length === 0 ? (
-            <p className="text-center text-gray-500">No recipes found.</p>
-          ) : (
-            <RecipeList recipes={user?.recipes || []} />
-          )}
+          {/* Display user's recipes using RecipeListUser */}
+          <RecipeListUser recipes={user?.recipes || []} />
         </div>
 
+        {/* Logout Button */}
         <div className="flex justify-end mt-8">
           <Button
             type="button"

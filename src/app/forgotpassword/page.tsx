@@ -1,7 +1,7 @@
 "use client";
 import IconHeader from "@/components/LoginSignupUI/IconHeader";
 import { useLoadingState } from "@/lib/hooks/useLoadingState";
-import { useApi } from "@/lib/hooks/ApiRequests";
+import { useApi } from "@/lib/helpers/ApiRequests";
 import Form from "@/components/forms/AuthForm";
 import Button from "@/components/Button";
 import { toast } from "react-hot-toast";

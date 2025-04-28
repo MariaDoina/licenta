@@ -5,23 +5,23 @@ import Image from "next/image";
 interface AddItemProps {
   label: string;
   itemList: string[];
-  onAdd: (item: string) => void;
-  onRemove: (index: number) => void;
+  setItemList: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const AddItem: React.FC<AddItemProps> = ({
-  label,
-  itemList,
-  onAdd,
-  onRemove,
-}) => {
+const AddItem: React.FC<AddItemProps> = ({ label, itemList, setItemList }) => {
   const [newItem, setNewItem] = useState("");
 
+  // Add item to the list
   const handleAdd = () => {
     if (newItem.trim() !== "" && !itemList.includes(newItem.trim())) {
-      onAdd(newItem.trim());
+      setItemList((prev) => [...prev, newItem.trim()]);
       setNewItem("");
     }
+  };
+
+  // Remove item from the list
+  const handleRemove = (index: number) => {
+    setItemList((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -55,7 +55,7 @@ const AddItem: React.FC<AddItemProps> = ({
               <span className="text-sm">{item}</span>
               <button
                 type="button"
-                onClick={() => onRemove(index)}
+                onClick={() => handleRemove(index)}
                 className="ml-2 text-red-500 hover:text-red-700 cursor-pointer"
               >
                 <Image

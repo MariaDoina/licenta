@@ -31,6 +31,6 @@ export const config = {
     "/login",
     "/signup",
     "/verifyemail",
-    "/create_recipe",
+    "/create_recipe/:path*",
   ],
 };
