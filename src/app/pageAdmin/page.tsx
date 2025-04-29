@@ -4,34 +4,42 @@ import { useEffect, useState } from "react";
 import AdminUserCard from "@/components/Admin/AdminUserCard";
 import AdminRecipeCard from "@/components/Admin/AdminRecipeCard";
 import { useRouter } from "next/navigation";
+import { useApi } from "@/lib/helpers/ApiRequests";
+import { useLoadingState } from "@/lib/hooks/useLoadingState";
+import Spinner from "@/components/LoadingSpinner";
 
 export default function AdminPage() {
   const [users, setUsers] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [error, setError] = useState("");
+  const { isLoading, startLoading, stopLoading } = useLoadingState();
   const router = useRouter();
+  const { getAdminData } = useApi();
 
   useEffect(() => {
     const fetchAdminData = async () => {
       try {
-        const res = await fetch("/api/admin/seeAllRecipeUser", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        const data = await res.json();
-
-        if (!res.ok) throw new Error(data.error || "Failed to fetch");
-
+        startLoading();
+        const data = await getAdminData();
         setUsers(data.users);
         setRecipes(data.recipes);
       } catch (err: any) {
         setError(err.message);
+      } finally {
+        stopLoading();
       }
     };
 
     fetchAdminData();
   }, []);
+
+  const handleDeleteUser = (id: string) => {
+    setUsers((prev) => prev.filter((u: any) => u._id !== id));
+  };
+
+  const handleDeleteRecipe = (id: string) => {
+    setRecipes((prev) => prev.filter((r: any) => r._id !== id));
+  };
 
   if (error) {
     return (
@@ -49,24 +57,40 @@ export default function AdminPage() {
     );
   }
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6 space-y-8">
-      <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+    <div className="bg-gradient-to-br from-green-100 to-blue-100 min-h-screen p-6 space-y-10 max-w-5xl mx-auto">
+      <h1 className="text-3xl font-bold text-center">Admin Dashboard</h1>
 
       <section>
-        <h2 className="text-xl font-semibold mb-2">Users</h2>
-        <div className="grid gap-4">
+        <h2 className="text-2xl font-semibold mb-4">Users</h2>
+        <div className="grid md:grid-cols-2 gap-4">
           {users.map((user: any) => (
-            <AdminUserCard key={user._id} user={user} />
+            <AdminUserCard
+              key={user._id}
+              user={user}
+              onDelete={handleDeleteUser}
+            />
           ))}
         </div>
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold mb-2">Recipes</h2>
-        <div className="grid gap-4">
+        <h2 className="text-2xl font-semibold mb-4">Recipes</h2>
+        <div className="grid md:grid-cols-2 gap-4">
           {recipes.map((recipe: any) => (
-            <AdminRecipeCard key={recipe._id} recipe={recipe} />
+            <AdminRecipeCard
+              key={recipe._id}
+              recipe={recipe}
+              onDelete={handleDeleteRecipe}
+            />
           ))}
         </div>
       </section>

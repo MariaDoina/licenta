@@ -272,6 +272,54 @@ export const useApi = () => {
     }
   };
 
+  //Api request for admin to get all users and recipes
+  const getAdminData = async () => {
+    try {
+      const res = await axios.get("/api/admin/seeAllRecipeUser", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      return res.data;
+    } catch (error: any) {
+      toast.error("Failed to fetch data.");
+      throw error;
+    }
+  };
+
+  //Api request to delete a recipe by id
+  const deleteRecipe = async (recipeId: string) => {
+    try {
+      const res = await axios.delete(`/api/admin/recipes/${recipeId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      toast.success("Recipe deleted successfully");
+      return res.data;
+    } catch (error: any) {
+      toast.error("Failed to delete recipe");
+    }
+  };
+
+  //Api request to delete a user by id
+  const deleteUser = async (userId: string) => {
+    try {
+      const res = await axios.delete(`/api/admin/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      toast.success("User deleted successfully.");
+      return res.data;
+    } catch (error: any) {
+      toast.error("Failed to delete user.");
+      throw error;
+    }
+  };
+
   return {
     signup,
     login,
@@ -288,5 +336,8 @@ export const useApi = () => {
     uploadImage,
     createRecipe,
     updateRecipe,
+    deleteRecipe,
+    deleteUser,
+    getAdminData,
   };
 };

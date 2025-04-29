@@ -1,30 +1,44 @@
 "use client";
 
-export default function AdminUserCard({ user }: { user: any }) {
+import { useApi } from "@/lib/helpers/ApiRequests";
+import { toast } from "react-hot-toast";
+import { useLoadingState } from "@/lib/hooks/useLoadingState";
+
+export default function AdminUserCard({
+  user,
+  onDelete,
+}: {
+  user: any;
+  onDelete: (id: string) => void;
+}) {
+  const { deleteUser } = useApi();
+  const { isLoading, startLoading, stopLoading } = useLoadingState();
+
   const handleDelete = async () => {
     if (!confirm(`Are you sure you want to delete ${user.username}?`)) return;
 
-    const res = await fetch(`/api/admin/users/${user._id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-
-    const data = await res.json();
-    alert(data.message || data.error);
-    window.location.reload();
+    try {
+      startLoading();
+      await deleteUser(user._id);
+      toast.success("User deleted successfully.");
+      onDelete(user._id);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to delete user.");
+    } finally {
+      stopLoading();
+    }
   };
 
   return (
-    <div className="border p-4 rounded shadow-md">
-      <h3 className="font-semibold">{user.username}</h3>
-      <p>{user.email}</p>
+    <div className=" border p-4 rounded-xl shadow-md  space-y-2 bg-white">
+      <h3 className="text-lg font-semibold">{user.username}</h3>
+      <p className="text-sm text-gray-600">{user.email}</p>
       <button
         onClick={handleDelete}
-        className="mt-2 text-sm text-red-600 hover:underline"
+        className="text-red-600 text-sm hover:underline"
+        disabled={isLoading}
       >
-        Delete User
+        {isLoading ? "Deleting..." : "Delete User"}
       </button>
     </div>
   );

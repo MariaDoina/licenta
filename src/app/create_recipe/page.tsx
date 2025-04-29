@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useApi } from "@/lib/helpers/ApiRequests";
 import { motion } from "framer-motion";
 import RecipeCard from "@/components/RecipeUI/CreateRecipeCard";
@@ -25,6 +25,8 @@ const CreateRecipe = () => {
   } = useSearch(500);
 
   const { getRecipes } = useApi();
+
+  const bottomRef = useRef<HTMLDivElement | null>(null); // Aici am corectat tipul
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -53,6 +55,11 @@ const CreateRecipe = () => {
     setter: React.Dispatch<React.SetStateAction<string>>
   ) => {
     setter(e.target.value);
+  };
+
+  // Functie care face scroll la secțiunea de jos
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -125,6 +132,16 @@ const CreateRecipe = () => {
         </div>
       </div>
 
+      {/* Button to scroll to the bottom */}
+      <div className=" mb-10">
+        <button
+          onClick={scrollToBottom}
+          className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition"
+        >
+          Scroll to Bottom
+        </button>
+      </div>
+
       {/* Loading state small message */}
       {loading && (
         <div className="text-gray-500 mb-4">Searching recipes...</div>
@@ -153,6 +170,9 @@ const CreateRecipe = () => {
 
       {/* Error Message */}
       {error && <div className="text-lg text-red-600 mt-8">{error}</div>}
+
+      {/* The bottom section */}
+      <div ref={bottomRef} className="mt-16" />
     </div>
   );
 };

@@ -207,14 +207,20 @@ export default function ProfilePage() {
           <RecipeListUser recipes={user?.recipes || []} />
         </div>
 
-        {/* Logout Button */}
-        <div className="flex justify-end mt-8">
+        {/* Buttons: Logout and Admin Page */}
+        <div className="flex justify-end gap-4 mt-8">
           <Button
             type="button"
             loading={isLoading}
             title="Logout"
             variant="btn_red"
             onClick={handleLogout}
+          />
+          <Button
+            type="button"
+            title="Go to Admin Page"
+            variant="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
+            onClick={() => router.push("/pageAdmin")}
           />
         </div>
       </div>
