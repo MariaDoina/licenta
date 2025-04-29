@@ -10,17 +10,21 @@ interface Recipe {
   tags: string[];
 }
 
+interface GetRecipesResponse {
+  recipes: Recipe[];
+}
+
 const useRecipes = () => {
   const { getRecipes } = useApi();
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [data, setData] = useState<GetRecipesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getRecipes();
-        setRecipes(data);
+        const response = await getRecipes({});
+        setData(response);
       } catch (err: any) {
         setError(err.message || "Failed to fetch recipes.");
       } finally {
@@ -31,7 +35,7 @@ const useRecipes = () => {
     fetchData();
   }, []);
 
-  return { recipes, loading, error };
+  return { data, loading, error };
 };
 
 export default useRecipes;

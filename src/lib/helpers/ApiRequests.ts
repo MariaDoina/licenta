@@ -82,36 +82,32 @@ export const useApi = () => {
   };
 
   //Recipe related API requests
-  const getRecipes = async (filters: {
+  const getRecipes = async (filters?: {
     ingredients?: string;
     tags?: string;
     title?: string;
   }) => {
     try {
-      // Construct the query string based on the filters object
-      const { ingredients, tags, title } = filters;
       const params = new URLSearchParams();
 
-      if (ingredients?.trim()) {
-        params.append("ingredients", ingredients.trim());
+      if (filters?.ingredients?.trim()) {
+        params.append("ingredients", filters.ingredients.trim());
       }
 
-      if (tags?.trim()) {
-        params.append("tags", tags.trim());
+      if (filters?.tags?.trim()) {
+        params.append("tags", filters.tags.trim());
       }
 
-      if (title?.trim()) {
-        params.append("title", title.trim());
+      if (filters?.title?.trim()) {
+        params.append("title", filters.title.trim());
       }
 
-      // Make the GET request with the query parameters
       const response = await axios.get(
         `/api/recipes/getRecipes?${params.toString()}`
       );
 
-      return response.data; // Return the filtered recipes
+      return response.data;
     } catch (error: unknown) {
-      // Check if the error is an instance of Error
       if (error instanceof Error) {
         throw new Error(error.message || "Failed to fetch recipes.");
       } else {

@@ -4,7 +4,8 @@ import useRecipes from "@/lib/hooks/useRecipes";
 import Link from "next/link";
 
 const Features = () => {
-  const { recipes = [], loading, error } = useRecipes();
+  const { data, loading, error } = useRecipes();
+  const recipes = data?.recipes ?? [];
 
   if (loading) {
     return (
@@ -26,10 +27,7 @@ const Features = () => {
         <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {recipes.slice(0, 8).map((recipe) => (
             <Link key={recipe._id} href={`/create_recipe/${recipe._id}`}>
-              <div
-                key={recipe._id}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.03] transition-transform duration-300"
-              >
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.03] transition-transform duration-300">
                 {recipe.imageUrl ? (
                   <Image
                     src={recipe.imageUrl}
@@ -51,6 +49,12 @@ const Features = () => {
               </div>
             </Link>
           ))}
+        </div>
+      )}
+
+      {error && (
+        <div className="text-center text-red-600 mt-8">
+          Failed to load recipes: {error}
         </div>
       )}
     </div>
