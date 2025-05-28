@@ -16,17 +16,26 @@ type UserData = {
   about: string;
   specialties: string[];
   recipes: Recipe[];
+  savedRecipes?: Recipe[];
   profileImageUrl: string | null;
 };
 
 export default function ProfilePage() {
-  const { logout, getUserDetails, updateProfile, uploadProfileImage } =
-    useApi();
+  const {
+    logout,
+    getUserDetails,
+    updateProfile,
+    uploadProfileImage,
+    getSavedRecipes,
+  } = useApi();
   const router = useRouter();
 
   const [user, setUser] = useState<UserData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const { isLoading, startLoading, stopLoading } = useLoadingState();
+  const [showOwnRecipes, setShowOwnRecipes] = useState(true);
+  const [showSavedRecipes, setShowSavedRecipes] = useState(true);
+  const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
 
   // Fetch user details from API
   const fetchUserDetails = async () => {
@@ -35,6 +44,16 @@ export default function ProfilePage() {
       setUser(userData);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  // Fetch saved recipes when user data is available
+  const fetchSavedRecipes = async () => {
+    try {
+      const saved = await getSavedRecipes();
+      setSavedRecipes(saved);
+    } catch (error) {
+      console.error("Failed to fetch saved recipes:", error);
     }
   };
 
@@ -89,6 +108,7 @@ export default function ProfilePage() {
   // Fetch user data when component mounts
   useEffect(() => {
     fetchUserDetails();
+    fetchSavedRecipes();
   }, []);
 
   return (
@@ -189,22 +209,36 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* User's Recipes */}
+        {/* User's Recipes with collapse toggle */}
         <div className="bg-white shadow-lg rounded-2xl p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Your Recipes</h2>
-            <div className="flex gap-4">
-              <Button
-                type="button"
-                title="Add New Recipe"
-                variant="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
-                onClick={() => router.push("/create_recipe/manual")}
-              />
-            </div>
+            <h2
+              className="text-2xl font-bold cursor-pointer"
+              onClick={() => setShowOwnRecipes(!showOwnRecipes)}
+            >
+              {showOwnRecipes ? "▼" : "▶"} Your Recipes
+            </h2>
+            <Button
+              type="button"
+              title="Add New Recipe"
+              variant="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+              onClick={() => router.push("/create_recipe/manual")}
+            />
           </div>
+          {showOwnRecipes && <RecipeListUser recipes={user?.recipes || []} />}
+        </div>
 
-          {/* Display user's recipes using RecipeListUser */}
-          <RecipeListUser recipes={user?.recipes || []} />
+        {/* Saved Recipes Section */}
+        <div className="bg-white shadow-lg rounded-2xl p-6 mt-8">
+          <div className="flex justify-between items-center mb-6">
+            <h2
+              className="text-2xl font-bold cursor-pointer"
+              onClick={() => setShowSavedRecipes(!showSavedRecipes)}
+            >
+              {showSavedRecipes ? "▼" : "▶"} Saved Recipes
+            </h2>
+          </div>
+          {showSavedRecipes && <RecipeListUser recipes={savedRecipes} />}
         </div>
 
         {/* Buttons: Logout and Admin Page */}

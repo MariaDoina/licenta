@@ -1,6 +1,6 @@
 "use client";
-
 import { useParams, useRouter } from "next/navigation";
+import { useApi } from "@/lib/helpers/ApiRequests";
 import useRecipe from "@/lib/hooks/useRecipe";
 import Button from "@/components/Button";
 import Image from "next/image";
@@ -9,6 +9,15 @@ const RecipeDetailPage = () => {
   const { id } = useParams();
   const router = useRouter();
   const { recipe, loading, error } = useRecipe(id as string);
+  const { saveRecipe } = useApi();
+
+  const handleSaveRecipe = async () => {
+    try {
+      await saveRecipe(id as string);
+    } catch (error) {
+      console.error("Eroare la salvarea rețetei:", error);
+    }
+  };
 
   const token =
     typeof window !== "undefined"
@@ -166,6 +175,15 @@ const RecipeDetailPage = () => {
               </p>
             </div>
           </div>
+        </div>
+        <div className="flex justify-start mt-4 mb-8 ml-7">
+          <Button
+            type="button"
+            title="Save Recipe"
+            icon="/bookmark.svg"
+            variant="btn_small_gradient"
+            onClick={handleSaveRecipe}
+          />
         </div>
       </div>
     </div>

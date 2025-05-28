@@ -68,6 +68,13 @@ const userSchema = new mongoose.Schema({
     },
   ],
 
+  savedRecipes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "recipes",
+    },
+  ],
+
   createdAt: {
     type: Date,
     default: Date.now,

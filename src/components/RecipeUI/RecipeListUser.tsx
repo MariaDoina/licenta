@@ -5,9 +5,17 @@ import { useRouter } from "next/navigation";
 
 interface Props {
   recipes: Recipe[];
+  showUnsaveButton?: boolean;
+  onUnsave?: (recipeId: string) => void;
+  showEditButton?: boolean; // opțional, default true
 }
 
-const RecipeListUser = ({ recipes }: Props) => {
+const RecipeListUser = ({
+  recipes,
+  showUnsaveButton = false,
+  onUnsave,
+  showEditButton = true,
+}: Props) => {
   const router = useRouter();
 
   if (recipes.length === 0) {
@@ -23,8 +31,24 @@ const RecipeListUser = ({ recipes }: Props) => {
       {recipes.map((recipe) => (
         <div
           key={recipe._id}
-          className="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.03] transition-transform duration-300"
+          className="relative bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.03] transition-transform duration-300"
         >
+          {/* Buton de Unsave (colț dreapta sus) */}
+          {showUnsaveButton && onUnsave && (
+            <div className="absolute top-2 right-2 z-10">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onUnsave(recipe._id);
+                }}
+                className="text-red-500 bg-white border border-red-300 rounded-full px-3 py-1 text-sm shadow-sm hover:bg-red-100 transition"
+              >
+                Unsave
+              </button>
+            </div>
+          )}
+
           {/* Wrap the whole card in a Link */}
           <Link href={`/create_recipe/${recipe._id}`} className="block">
             {recipe.imageUrl ? (
@@ -49,7 +73,7 @@ const RecipeListUser = ({ recipes }: Props) => {
               <div className="flex justify-center items-center gap-6 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <img src="/clock.svg" alt="clock" className="w-5 h-5" />
-                  <span className="text-lg">{recipe.cookingTime} min</span>{" "}
+                  <span className="text-lg">{recipe.cookingTime} min</span>
                 </div>
                 <span className="border-l h-5 border-gray-300"></span>
                 <span className="text-indigo-600 font-medium capitalize text-lg">
@@ -73,15 +97,17 @@ const RecipeListUser = ({ recipes }: Props) => {
             </div>
           </Link>
 
-          {/* Edit Button */}
-          <div className="p-4 bg-gray-100 flex justify-center">
-            <Button
-              type="button"
-              title="Edit Recipe"
-              variant="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600"
-              onClick={() => router.push(`/edit_recipe/${recipe._id}`)} // Keep the button functionality separate
-            />
-          </div>
+          {/* Edit Button - afișat doar dacă e permis */}
+          {showEditButton && (
+            <div className="p-4 bg-gray-100 flex justify-center">
+              <Button
+                type="button"
+                title="Edit Recipe"
+                variant="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600"
+                onClick={() => router.push(`/edit_recipe/${recipe._id}`)}
+              />
+            </div>
+          )}
         </div>
       ))}
     </div>

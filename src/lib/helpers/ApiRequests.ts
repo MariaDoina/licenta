@@ -204,6 +204,20 @@ export const useApi = () => {
     }
   };
 
+  //Api to save recipe so user can access it later
+  const saveRecipe = async (recipeId: string) => {
+    try {
+      const res = await axios.post("/api/recipes/saveRecipeToUser", {
+        recipeId,
+      });
+      toast.success("Recipe was saved succesfully!");
+      return res.data;
+    } catch (error: any) {
+      toast.error("Could not save recipe. Please try again.");
+      throw error;
+    }
+  };
+
   //Api request for user logout, getting user data, updating user data, and getting user recipes
   const logout = async () => {
     try {
@@ -316,6 +330,29 @@ export const useApi = () => {
     }
   };
 
+  //Api request to get all saved recipes from user
+  const getSavedRecipes = async () => {
+    try {
+      const res = await axios.get("/api/recipes/getSavedRecipeFromUser");
+      return res.data.savedRecipes;
+    } catch (error: any) {
+      toast.error("Failed to fetch saved recipes.");
+      throw error;
+    }
+  };
+
+  //Api to unsave recipe
+  const unsaveRecipe = async (recipeId: string) => {
+    try {
+      const res = await axios.post("/api/recipes/unsaveRecipe", { recipeId });
+      toast.success("Recipe removed from saved successfully!");
+      return res.data;
+    } catch (error: any) {
+      toast.error("Failed to remove recipe from saved.");
+      throw error;
+    }
+  };
+
   return {
     signup,
     login,
@@ -335,5 +372,8 @@ export const useApi = () => {
     deleteRecipe,
     deleteUser,
     getAdminData,
+    saveRecipe,
+    getSavedRecipes,
+    unsaveRecipe,
   };
 };
