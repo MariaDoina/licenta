@@ -27,6 +27,7 @@ export default function ProfilePage() {
     updateProfile,
     uploadProfileImage,
     getSavedRecipes,
+    unsaveRecipe,
   } = useApi();
   const router = useRouter();
 
@@ -54,6 +55,22 @@ export default function ProfilePage() {
       setSavedRecipes(saved);
     } catch (error) {
       console.error("Failed to fetch saved recipes:", error);
+    }
+  };
+
+  // Handle unsaving a recipe
+  const handleUnsaveRecipe = async (recipeId: string) => {
+    try {
+      startLoading();
+      await unsaveRecipe(recipeId);
+      // Update the saved recipes state
+      setSavedRecipes((prev) =>
+        prev.filter((recipe) => recipe._id !== recipeId)
+      );
+    } catch (error) {
+      console.error(error);
+    } finally {
+      stopLoading();
     }
   };
 
@@ -238,7 +255,15 @@ export default function ProfilePage() {
               {showSavedRecipes ? "▼" : "▶"} Saved Recipes
             </h2>
           </div>
-          {showSavedRecipes && <RecipeListUser recipes={savedRecipes} />}
+
+          {showSavedRecipes && (
+            <RecipeListUser
+              recipes={savedRecipes}
+              showUnsaveButton={true}
+              onUnsave={handleUnsaveRecipe}
+              showEditButton={false} // ca să nu afișeze butonul Edit aici
+            />
+          )}
         </div>
 
         {/* Buttons: Logout and Admin Page */}
