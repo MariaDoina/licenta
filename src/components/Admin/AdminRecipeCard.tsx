@@ -4,6 +4,15 @@ import { toast } from "react-hot-toast";
 import Image from "next/image";
 import { Recipe } from "@/constants/typesDB"; // ✅ Import direct
 
+function isErrorWithMessage(error: unknown): error is { message: string } {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof (error as { message?: unknown }).message === "string"
+  );
+}
+
 export default function AdminRecipeCard({
   recipe,
   onDelete,
@@ -30,13 +39,8 @@ export default function AdminRecipeCard({
       await deleteRecipe(recipe._id);
       onDelete(recipe._id);
     } catch (error: unknown) {
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "message" in error &&
-        typeof (error as any).message === "string"
-      ) {
-        toast.error((error as any).message);
+      if (isErrorWithMessage(error)) {
+        toast.error(error.message);
       } else {
         toast.error("Failed to delete recipe.");
       }
