@@ -11,7 +11,8 @@ export async function GET(request: NextRequest) {
     const tagsParam = searchParams.get("tags");
     const titleParam = searchParams.get("title");
 
-    const query: any = {};
+    // const query: any = {};
+    const query: Record<string, unknown> = {};
 
     // Filtering by ingredients
     if (ingredientsParam) {

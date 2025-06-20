@@ -1,19 +1,8 @@
-"use client";
-
 import { useApi } from "@/lib/helpers/ApiRequests";
 import { useLoadingState } from "@/lib/hooks/useLoadingState";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
-
-type Recipe = {
-  _id: string;
-  title: string;
-  imageUrl?: string;
-  difficulty: string;
-  cookingTime?: number;
-  ingredients?: string[];
-  tags?: string[];
-};
+import { Recipe } from "@/constants/typesDB"; // ✅ Import direct
 
 export default function AdminRecipeCard({
   recipe,
@@ -25,16 +14,22 @@ export default function AdminRecipeCard({
   const { deleteRecipe } = useApi();
   const { isLoading, startLoading, stopLoading } = useLoadingState();
 
+  if (!recipe) {
+    return (
+      <div className="border p-4 rounded-xl shadow-md bg-gray-100 text-gray-500">
+        Recipe is unavailable.
+      </div>
+    );
+  }
+
   const handleDelete = async () => {
     if (!confirm(`Delete recipe: ${recipe.title}?`)) return;
 
     try {
       startLoading();
       await deleteRecipe(recipe._id);
-      // toast.success("Recipe deleted.");
       onDelete(recipe._id);
     } catch (error: unknown) {
-      // Dacă error este unknown, verificăm dacă are proprietatea message
       if (
         typeof error === "object" &&
         error !== null &&
@@ -52,7 +47,6 @@ export default function AdminRecipeCard({
 
   return (
     <div className="border p-4 rounded-xl shadow-md bg-white space-y-3">
-      {/* Imaginea rețetei */}
       <div className="w-full h-48 relative">
         {recipe.imageUrl ? (
           <Image
@@ -71,7 +65,8 @@ export default function AdminRecipeCard({
 
       <h3 className="text-xl font-semibold">{recipe.title}</h3>
       <p className="text-sm text-gray-600">
-        Difficulty: <span className="capitalize">{recipe.difficulty}</span>
+        Difficulty:{" "}
+        <span className="capitalize">{recipe.difficulty ?? "unknown"}</span>
       </p>
       {recipe.cookingTime && (
         <p className="text-sm text-gray-600">

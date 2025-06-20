@@ -7,22 +7,11 @@ import { useRouter } from "next/navigation";
 import { useApi } from "@/lib/helpers/ApiRequests";
 import { useLoadingState } from "@/lib/hooks/useLoadingState";
 import Spinner from "@/components/LoadingSpinner";
-
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-}
-
-interface Recipe {
-  _id: string;
-  title: string;
-  description?: string;
-}
+import { Recipe, UserData } from "@/constants/typesDB";
 
 export default function AdminPage() {
-  const [users, setUsers] = useState([]);
-  const [recipes, setRecipes] = useState([]);
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [error, setError] = useState("");
   const { isLoading, startLoading, stopLoading } = useLoadingState();
   const router = useRouter();
@@ -45,16 +34,14 @@ export default function AdminPage() {
         stopLoading();
       }
     };
-
     fetchAdminData();
   }, []);
 
   const handleDeleteUser = (id: string) => {
-    setUsers((prev) => prev.filter((u: any) => u._id !== id));
+    setUsers((prev) => prev.filter((user) => user._id !== id));
   };
-
   const handleDeleteRecipe = (id: string) => {
-    setRecipes((prev) => prev.filter((r: any) => r._id !== id));
+    setRecipes((prev) => prev.filter((recipe) => recipe._id !== id));
   };
 
   if (error) {
@@ -88,7 +75,7 @@ export default function AdminPage() {
       <section>
         <h2 className="text-2xl font-semibold mb-4">Users</h2>
         <div className="grid md:grid-cols-2 gap-4">
-          {users.map((user: any) => (
+          {users.map((user) => (
             <AdminUserCard
               key={user._id}
               user={user}
@@ -101,7 +88,7 @@ export default function AdminPage() {
       <section>
         <h2 className="text-2xl font-semibold mb-4">Recipes</h2>
         <div className="grid md:grid-cols-2 gap-4">
-          {recipes.map((recipe: any) => (
+          {recipes.map((recipe) => (
             <AdminRecipeCard
               key={recipe._id}
               recipe={recipe}

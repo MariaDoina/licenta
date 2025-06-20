@@ -3,12 +3,22 @@
 import { useApi } from "@/lib/helpers/ApiRequests";
 import { toast } from "react-hot-toast";
 import { useLoadingState } from "@/lib/hooks/useLoadingState";
+import { UserData } from "@/constants/typesDB";
+
+function isErrorWithMessage(error: unknown): error is { message: string } {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof (error as any).message === "string"
+  );
+}
 
 export default function AdminUserCard({
   user,
   onDelete,
 }: {
-  user: any;
+  user: UserData;
   onDelete: (id: string) => void;
 }) {
   const { deleteUser } = useApi();
@@ -23,13 +33,8 @@ export default function AdminUserCard({
       toast.success("User deleted successfully.");
       onDelete(user._id);
     } catch (error: unknown) {
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "message" in error &&
-        typeof (error as any).message === "string"
-      ) {
-        toast.error((error as any).message);
+      if (isErrorWithMessage(error)) {
+        toast.error(error.message);
       } else {
         toast.error("Failed to delete user.");
       }
@@ -39,7 +44,7 @@ export default function AdminUserCard({
   };
 
   return (
-    <div className=" border p-4 rounded-xl shadow-md  space-y-2 bg-white">
+    <div className="border p-4 rounded-xl shadow-md space-y-2 bg-white">
       <h3 className="text-lg font-semibold">{user.username}</h3>
       <p className="text-sm text-gray-600">{user.email}</p>
       <button
