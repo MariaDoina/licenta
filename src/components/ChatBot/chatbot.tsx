@@ -48,7 +48,7 @@ export default function Chatbot() {
     details: {
       [ingredient: string]: DetailEntry;
     };
-    [key: string]: any;
+    [key: string]: unknown;
   };
 
   const handleResponse = (data: ResponseData) => {
@@ -114,7 +114,7 @@ export default function Chatbot() {
         fullText = `I ate ${grams} grams of ${pendingIngredient}`;
         setPendingIngredient(null);
       }
-
+      // http://localhost:8000/qa
       const response = await axios.post(
         "https://modelai-v37f.onrender.com/qa",
         {
