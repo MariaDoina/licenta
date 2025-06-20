@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Toaster } from "react-hot-toast";
+import Chatbot from "@/components/ChatBot/chatbot";
 
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -20,9 +21,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Navbar />
-        <main className="relative overlfow-hidden">
+        <main className="relative overflow-hidden">
           {children}
           <Toaster position="top-center" />
+          <Chatbot />
         </main>
         <Footer />
       </body>
