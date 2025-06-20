@@ -16,7 +16,12 @@ export default function VerifyEmailPage() {
     try {
       await verifyEmail(token);
       setVerified(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Verification failed:", error.message);
+      } else {
+        console.error("Verification failed with unknown error");
+      }
       setError(true);
     }
   };

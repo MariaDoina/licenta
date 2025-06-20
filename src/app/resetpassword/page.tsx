@@ -39,8 +39,12 @@ export default function ResetPasswordPage() {
       startLoading();
       await resetPassword({ token, newpassword: passwords.newPassword });
       router.push("/login");
-    } catch (error: any) {
-      toast.error("Something went wrong. Please try again.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     } finally {
       stopLoading();
     }

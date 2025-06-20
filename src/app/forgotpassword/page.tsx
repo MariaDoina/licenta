@@ -26,8 +26,14 @@ export default function ForgotPasswordPage() {
     try {
       startLoading();
       await forgotPassword(user);
-    } catch (error: any) {
-      console.log("Couldn't send email", error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log("Couldn't send email", error.message);
+        toast.error(error.message);
+      } else {
+        console.log("Couldn't send email", error);
+        toast.error("An unexpected error occurred.");
+      }
     } finally {
       stopLoading();
     }

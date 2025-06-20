@@ -19,13 +19,13 @@ const RecipeDetailPage = () => {
     }
   };
 
-  const token =
-    typeof window !== "undefined"
-      ? document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("token="))
-          ?.split("=")[1]
-      : null;
+  // const token =
+  //   typeof window !== "undefined"
+  //     ? document.cookie
+  //         .split("; ")
+  //         .find((row) => row.startsWith("token="))
+  //         ?.split("=")[1]
+  //     : null;
 
   if (loading)
     return (
@@ -77,10 +77,19 @@ const RecipeDetailPage = () => {
         {/* Recipe Image and Difficulty Badge */}
         {imageUrl && (
           <div className="relative">
-            <img
+            {/* <img
               src={imageUrl}
               alt={title}
               className="w-full h-[300px] object-cover rounded-t-lg"
+            /> */}
+            <Image
+              src={imageUrl}
+              alt={title}
+              className="rounded-t-lg"
+              width={800} // setează un width potrivit
+              height={300} // setează un height potrivit
+              style={{ objectFit: "cover", width: "100%", height: "300px" }}
+              priority // opțional, pentru încărcare rapidă
             />
             {difficulty && (
               <span className="absolute top-4 right-4 bg-gray-50 text-md text-gray-700 font-medium capitalize px-3 py-1 rounded-full border-none shadow">

@@ -5,11 +5,21 @@ import { useLoadingState } from "@/lib/hooks/useLoadingState";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 
+type Recipe = {
+  _id: string;
+  title: string;
+  imageUrl?: string;
+  difficulty: string;
+  cookingTime?: number;
+  ingredients?: string[];
+  tags?: string[];
+};
+
 export default function AdminRecipeCard({
   recipe,
   onDelete,
 }: {
-  recipe: any;
+  recipe: Recipe;
   onDelete: (id: string) => void;
 }) {
   const { deleteRecipe } = useApi();
@@ -23,8 +33,18 @@ export default function AdminRecipeCard({
       await deleteRecipe(recipe._id);
       // toast.success("Recipe deleted.");
       onDelete(recipe._id);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to delete recipe.");
+    } catch (error: unknown) {
+      // Dacă error este unknown, verificăm dacă are proprietatea message
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof (error as any).message === "string"
+      ) {
+        toast.error((error as any).message);
+      } else {
+        toast.error("Failed to delete recipe.");
+      }
     } finally {
       stopLoading();
     }
@@ -32,7 +52,7 @@ export default function AdminRecipeCard({
 
   return (
     <div className="border p-4 rounded-xl shadow-md bg-white space-y-3">
-      {/* If recipe has an image, display it, otherwise show "No Image" */}
+      {/* Imaginea rețetei */}
       <div className="w-full h-48 relative">
         {recipe.imageUrl ? (
           <Image
@@ -58,20 +78,20 @@ export default function AdminRecipeCard({
           Cooking Time: {recipe.cookingTime} min
         </p>
       )}
-      {recipe.ingredients?.length > 0 && (
+      {recipe.ingredients && recipe.ingredients.length > 0 && (
         <div className="text-sm text-gray-700">
           <strong>Ingredients:</strong>
           <ul className="list-disc ml-5">
-            {recipe.ingredients.slice(0, 2).map((ing: string, idx: number) => (
+            {recipe.ingredients.slice(0, 2).map((ing, idx) => (
               <li key={idx}>{ing}</li>
             ))}
             {recipe.ingredients.length > 2 && <li>...</li>}
           </ul>
         </div>
       )}
-      {recipe.tags?.length > 0 && (
+      {recipe.tags && recipe.tags.length > 0 && (
         <div className="flex flex-wrap gap-1">
-          {recipe.tags.map((tag: string, idx: number) => (
+          {recipe.tags.map((tag, idx) => (
             <span
               key={idx}
               className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full"

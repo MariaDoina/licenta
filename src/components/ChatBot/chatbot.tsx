@@ -117,11 +117,17 @@ export default function Chatbot() {
       } else {
         handleResponse(data);
       }
-    } catch {
-      setMessages((msgs) => [
-        ...msgs,
-        { from: "bot", text: "Server error. Please try again." },
-      ]);
+    } catch (error) {
+      let message = "Server error. Please try again.";
+      if (
+        error &&
+        typeof error === "object" &&
+        "message" in error &&
+        typeof (error as any).message === "string"
+      ) {
+        message = (error as any).message;
+      }
+      setMessages((msgs) => [...msgs, { from: "bot", text: message }]);
     }
 
     setLoading(false);

@@ -71,7 +71,12 @@ export default function CreateRecipeForm() {
       setCookingTime("");
       setImageFile(null);
       setTags([]); // Reset tags
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unknown error occurred");
+      }
     } finally {
       stopLoading();
     }

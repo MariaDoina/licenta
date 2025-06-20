@@ -18,12 +18,14 @@ export async function GET(request: NextRequest) {
       message: "User is authenticated",
       success: true,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       {
         message: "Error verifying token",
         success: false,
-        error: error.message,
+        error: errorMessage,
       },
       { status: 500 }
     );

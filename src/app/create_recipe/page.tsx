@@ -32,16 +32,18 @@ const CreateRecipe = () => {
     const fetchRecipes = async () => {
       setLoading(true);
       try {
-        const filters = debouncedTitle || debouncedIngredients || debouncedTags;
-
         const response = await getRecipes({
           ingredients: debouncedIngredients,
           tags: debouncedTags,
           title: debouncedTitle,
         });
         setRecipes(response.recipes);
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch recipes.");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Failed to fetch recipes.");
+        }
       } finally {
         setLoading(false);
       }

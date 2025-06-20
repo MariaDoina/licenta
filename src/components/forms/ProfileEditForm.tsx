@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import Button from "@/components/Button";
-import { useApi } from "@/lib/helpers/ApiRequests";
+
 import { useLoadingState } from "@/lib/hooks/useLoadingState";
 
 type ProfileEditFormProps = {
@@ -36,7 +36,6 @@ const ProfileEditForm = ({
     profileImage: null,
   });
 
-  const { updateProfile } = useApi();
   const { isLoading, startLoading, stopLoading } = useLoadingState();
 
   const handleChange = (

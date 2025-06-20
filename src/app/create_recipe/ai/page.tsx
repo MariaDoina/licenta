@@ -7,9 +7,16 @@ import { useLoadingState } from "@/lib/hooks/useLoadingState";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+type Recipe = {
+  title: string;
+  cookingTime?: number;
+  ingredients?: string[];
+  instructions: string;
+};
+
 export default function GenerateRecipePage() {
   const [ingredients, setIngredients] = useState<string[]>([]);
-  const [recipes, setRecipes] = useState<any[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const { isLoading, startLoading, stopLoading } = useLoadingState();
 
   const handleGenerate = async () => {
@@ -31,11 +38,16 @@ export default function GenerateRecipePage() {
 
       // Afișează DOAR o rețetă, nu adaugă la listă
       setRecipes([recipe]);
-    } catch (err: any) {
-      toast.error(
-        "Error generating recipe. Please check your ingredients and try again."
-      );
-      console.error("Error:", err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(
+          "Error generating recipe. Please check your ingredients and try again."
+        );
+        console.error("Error:", err.message);
+      } else {
+        toast.error("An unknown error occurred.");
+        console.error("Unknown error:", err);
+      }
     } finally {
       stopLoading();
     }
@@ -61,8 +73,8 @@ export default function GenerateRecipePage() {
           viewport={{ once: true }}
           className="text-lg text-gray-600 max-w-xl mx-auto mb-10"
         >
-          Enter the ingredients you have on hand, and we'll create a delicious
-          recipe for you to try.
+          Enter the ingredients you have on hand, and we&apos;ll create a
+          delicious recipe for you to try.
         </motion.p>
 
         <AddItem
@@ -81,7 +93,7 @@ export default function GenerateRecipePage() {
 
         <div className="mt-6 space-y-6">
           {recipes.length > 0 ? (
-            recipes.map((recipe, index) => (
+            recipes.map((recipe: Recipe, index: number) => (
               <div key={index} className="border p-4 rounded-lg shadow">
                 <h2 className="text-xl font-semibold">{recipe.title}</h2>
                 <p className="text-gray-600">

@@ -5,6 +5,13 @@ import { getDataFromToken } from "@/lib/helpers/getDataFromToken";
 
 connect();
 
+type UpdateUserData = {
+  username?: string;
+  about?: string;
+  specialties?: string[];
+  profileImageUrl?: string;
+};
+
 export async function PUT(request: NextRequest) {
   try {
     const userId = await getDataFromToken(request);
@@ -32,8 +39,8 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    // Prepare update object
-    const updateData: any = {};
+    // Prepare update object with explicit typing
+    const updateData: UpdateUserData = {};
     if (username) updateData.username = username;
     if (about) updateData.about = about;
     if (specialties) updateData.specialties = specialties;
@@ -44,6 +51,7 @@ export async function PUT(request: NextRequest) {
       new: true,
       runValidators: true,
     });
+
     console.log("Updated user:", updatedUser);
 
     if (!updatedUser) {
@@ -54,8 +62,9 @@ export async function PUT(request: NextRequest) {
       message: "User updated successfully",
       data: updatedUser,
     });
-  } catch (error: any) {
-    console.error("Update profile error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

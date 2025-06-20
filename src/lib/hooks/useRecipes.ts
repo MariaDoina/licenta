@@ -25,8 +25,12 @@ const useRecipes = () => {
       try {
         const response = await getRecipes({});
         setData(response);
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch recipes.");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Failed to fetch recipes.");
+        }
       } finally {
         setLoading(false);
       }

@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     //Gemini API call
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
     const response = await model.generateContent(recipePrompt);
-    let textResponse = response.response.text();
+    const textResponse = response.response.text();
 
     // console.log("Gemini Response (Raw):", textResponse);
 
@@ -109,8 +109,10 @@ export async function POST(request: NextRequest) {
       success: true,
       savedRecipe,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error generating recipe:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "An unexpected error occurred.";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

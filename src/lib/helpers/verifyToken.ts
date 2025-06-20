@@ -12,7 +12,7 @@ export function verifyToken(token?: string): CustomJwtPayLoad | null {
 
   try {
     return jwt.verify(token, process.env.TOKEN_SECRET!) as CustomJwtPayLoad;
-  } catch (error) {
+  } catch {
     return null;
   }
 }

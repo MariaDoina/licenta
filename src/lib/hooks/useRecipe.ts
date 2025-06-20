@@ -30,8 +30,12 @@ const useRecipe = (id: string) => {
       try {
         const data = await getRecipeById(id);
         setRecipe(data);
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch recipe.");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Failed to fetch recipe.");
+        }
       } finally {
         setLoading(false);
       }

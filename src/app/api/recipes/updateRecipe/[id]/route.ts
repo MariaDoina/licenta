@@ -5,6 +5,16 @@ import { getDataFromToken } from "@/lib/helpers/getDataFromToken";
 
 connect();
 
+interface RecipeUpdateData {
+  title?: string;
+  ingredients?: string[];
+  instructions?: string;
+  cookingTime?: number;
+  imageUrl?: string;
+  difficulty?: "easy" | "medium" | "hard";
+  tags?: string[];
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -25,7 +35,7 @@ export async function PUT(
       tags,
     } = body;
 
-    // Validate input
+    // Validate input - check if at least one field is provided for update
     if (
       !title &&
       !ingredients &&
@@ -41,25 +51,25 @@ export async function PUT(
       );
     }
 
-    // Find the recipe ID from the request URL
-    const { id } = await params;
+    // Extract recipe ID from params
+    const { id } = params;
 
-    // Check if the recipe ID exists
+    // Find the recipe by ID
     const recipe = await Recipe.findById(id);
     if (!recipe) {
       return NextResponse.json({ error: "Recipe not found" }, { status: 404 });
     }
 
-    // Check if the user is authorized to update the recipe
-    if (recipe.userOwner.toString() !== userId) {
+    // Check user ownership
+    if (recipe.userOwner?.toString() !== userId) {
       return NextResponse.json(
         { error: "You are not authorized to update this recipe." },
         { status: 403 }
       );
     }
 
-    // Create an object with the fields to update
-    const updateData: any = {};
+    // Build update object using typed interface
+    const updateData: RecipeUpdateData = {};
     if (title) updateData.title = title;
     if (ingredients) updateData.ingredients = ingredients;
     if (instructions) updateData.instructions = instructions;
@@ -68,7 +78,7 @@ export async function PUT(
     if (difficulty) updateData.difficulty = difficulty;
     if (tags) updateData.tags = tags;
 
-    // Update the recipe in the database
+    // Update the recipe and return the new document
     const updatedRecipe = await Recipe.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
@@ -87,8 +97,10 @@ export async function PUT(
       message: "Recipe updated successfully",
       data: updatedRecipe,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Update recipe error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

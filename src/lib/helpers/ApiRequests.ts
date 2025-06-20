@@ -13,7 +13,7 @@ export const useApi = () => {
       const response = await axios.post("/api/users/signup", user);
       toast.success("Signup successful");
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("A user with this email already exists.");
       throw error;
     }
@@ -24,7 +24,7 @@ export const useApi = () => {
       const res = await axios.post("/api/users/login", user);
       toast.success("Login successful");
       return res.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(
         "User not found. Please check your email and password, then try again."
       );
@@ -40,7 +40,7 @@ export const useApi = () => {
       const res = await axios.post("/api/users/resetpassword", user);
       toast.success("Your password has been successfully changed!");
       return res.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Failed to reset password. Please try again.");
       throw error;
     }
@@ -51,8 +51,8 @@ export const useApi = () => {
       const res = await axios.post("/api/users/forgotpassword", user);
       toast.success("We’ve sent you a reset link! Please check your inbox.");
       return res.data;
-    } catch (error: any) {
-      if (error.response?.status === 400) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 400) {
         toast.error("No account found with that email. Please try again.");
       } else {
         toast.error("Something went wrong! Please try again later.");
@@ -65,7 +65,7 @@ export const useApi = () => {
     try {
       await axios.post("/api/users/verifyEmail", { token });
       toast.success("Email successfully verified!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Token is invalid or has expired.");
       throw error;
     }
@@ -121,8 +121,12 @@ export const useApi = () => {
     try {
       const response = await axios.get(`/api/recipes/${id}`);
       return response.data;
-    } catch (error: any) {
-      throw new Error(error.message || "Could not fetch recipe.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(error.message || "Could not fetch recipe.");
+      } else {
+        throw new Error("Could not fetch recipe.");
+      }
     }
   };
 
@@ -135,7 +139,7 @@ export const useApi = () => {
       const res = await axios.post("/api/recipes/uploadImage", formData);
       // toast.success("Image uploaded successfully!");
       return res.data.imageUrl;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error uploading image:", error);
       toast.error("Failed to upload image");
       throw error;
@@ -157,12 +161,10 @@ export const useApi = () => {
       // If creation is successful, show success toast
       toast.success("Recipe created successfully!");
       return res.data;
-    } catch (error: any) {
-      // If there's an error, check if it's a specific one related to duplicate title
-      if (error.response && error.response.data && error.response.data.error) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.data?.error) {
         const errorMessage = error.response.data.error;
 
-        // Show more specific error message if it's about duplicate title
         if (errorMessage === "A recipe with this title already exists.") {
           toast.error(
             "A recipe with this title already exists. Try searching for it."
@@ -198,7 +200,7 @@ export const useApi = () => {
       );
       toast.success("Recipe updated successfully!");
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Failed to update recipe.");
       throw error;
     }
@@ -223,8 +225,8 @@ export const useApi = () => {
     try {
       await axios.get("/api/users/logout");
       toast.success("Logged out successfully");
-    } catch (error: any) {
-      console.log(error.message);
+    } catch (error: unknown) {
+      console.log(error);
       toast.error("Failed to logout");
       throw error;
     }
@@ -235,7 +237,7 @@ export const useApi = () => {
       const res = await axios.get("/api/users/myUser");
       console.log("User details response:", res.data);
       return res.data.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error getting user details:", error);
       toast.error("Failed to get user details");
       throw error;
@@ -256,7 +258,7 @@ export const useApi = () => {
       });
       toast.success("Profile updated successfully");
       return res.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Failed to update profile");
       throw error;
     }
@@ -275,7 +277,7 @@ export const useApi = () => {
 
       toast.success("Profile image uploaded successfully!");
       return res.data.imageUrl;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error uploading profile image:", error);
       toast.error("Failed to upload profile image");
       throw error;
@@ -292,7 +294,7 @@ export const useApi = () => {
       });
 
       return res.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Failed to fetch data.");
       throw error;
     }
@@ -308,7 +310,7 @@ export const useApi = () => {
       });
       toast.success("Recipe deleted successfully");
       return res.data;
-    } catch (error: any) {
+    } catch {
       toast.error("Failed to delete recipe");
     }
   };
@@ -324,7 +326,7 @@ export const useApi = () => {
 
       toast.success("User deleted successfully.");
       return res.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Failed to delete user.");
       throw error;
     }
@@ -335,7 +337,7 @@ export const useApi = () => {
     try {
       const res = await axios.get("/api/recipes/getSavedRecipeFromUser");
       return res.data.savedRecipes;
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Failed to fetch saved recipes.");
       throw error;
     }
@@ -347,7 +349,7 @@ export const useApi = () => {
       const res = await axios.post("/api/recipes/unsaveRecipe", { recipeId });
       toast.success("Recipe removed from saved successfully!");
       return res.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Failed to remove recipe from saved.");
       throw error;
     }

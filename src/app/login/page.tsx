@@ -30,7 +30,14 @@ export default function LoginPage() {
       startLoading();
       await login(user);
       router.push("/");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+        console.error("Login error:", error.message);
+      } else {
+        toast.error("An unexpected error occurred.");
+        console.error("Login error:", error);
+      }
     } finally {
       stopLoading();
     }
@@ -74,7 +81,7 @@ export default function LoginPage() {
         {/* Login Link */}
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">
-            You don't have an account?&nbsp;
+            You don&apos;t have an account?&nbsp;
             <Link
               href="/signup"
               className="text-indigo-600 font-semibold hover:underline"

@@ -43,8 +43,10 @@ export async function POST(request: NextRequest) {
       success: true,
       savedRecipes: user.savedRecipes,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("API ERROR:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

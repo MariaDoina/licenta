@@ -22,8 +22,17 @@ export default function AdminUserCard({
       await deleteUser(user._id);
       toast.success("User deleted successfully.");
       onDelete(user._id);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to delete user.");
+    } catch (error: unknown) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof (error as any).message === "string"
+      ) {
+        toast.error((error as any).message);
+      } else {
+        toast.error("Failed to delete user.");
+      }
     } finally {
       stopLoading();
     }

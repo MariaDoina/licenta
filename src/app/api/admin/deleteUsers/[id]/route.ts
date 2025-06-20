@@ -40,10 +40,10 @@ export async function DELETE(
       if (recipe.imageUrl) {
         try {
           await deleteImageFromCloudinary(recipe.imageUrl);
-        } catch (err) {
+        } catch (imgError: unknown) {
           console.error(
             `Failed to delete image for recipe ${recipe._id}:`,
-            err
+            imgError
           );
         }
       }
@@ -56,8 +56,10 @@ export async function DELETE(
     return NextResponse.json({
       message: "User and their recipes deleted successfully",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting user:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "An unexpected error occurred.";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

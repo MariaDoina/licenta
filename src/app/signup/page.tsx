@@ -51,8 +51,14 @@ export default function SignupPage() {
       startLoading();
       await signup(user);
       router.push("/login");
-    } catch (error: any) {
-      console.log("Signup failed", error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log("Signup failed", error.message);
+        toast.error(error.message);
+      } else {
+        console.log("Signup failed", error);
+        toast.error("Signup failed. Please try again.");
+      }
     } finally {
       stopLoading();
     }

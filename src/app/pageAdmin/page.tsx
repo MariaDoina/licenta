@@ -8,6 +8,18 @@ import { useApi } from "@/lib/helpers/ApiRequests";
 import { useLoadingState } from "@/lib/hooks/useLoadingState";
 import Spinner from "@/components/LoadingSpinner";
 
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+}
+
+interface Recipe {
+  _id: string;
+  title: string;
+  description?: string;
+}
+
 export default function AdminPage() {
   const [users, setUsers] = useState([]);
   const [recipes, setRecipes] = useState([]);
@@ -23,8 +35,12 @@ export default function AdminPage() {
         const data = await getAdminData();
         setUsers(data.users);
         setRecipes(data.recipes);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred");
+        }
       } finally {
         stopLoading();
       }
